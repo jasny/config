@@ -7,7 +7,4 @@ php:
 services:
   - mysql
 
-before_script:
-  pecl install -s yaml
-
 script: phpunit --verbose

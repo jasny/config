@@ -2,6 +2,8 @@
 
 namespace Jasny\Config;
 
+use Jasny\Config;
+
 require_once 'Parser.php';
 
 /**

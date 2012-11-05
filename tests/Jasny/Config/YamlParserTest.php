@@ -17,7 +17,7 @@ class YamlParserTest extends \PHPUnit_Framework_TestCase
     {
         if (!function_exists('yaml_parse_file') && !function_exists('syck_load')) $this->markTestSkipped("yaml nor syck php extension is loaded");
         
-        $data = (object)array('grp1'=>(object)array('q'=>'abcd', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'), 'grp3'=>array('one', 'two', 'three'));
+        $data = (object)array('grp1'=>(object)array('q'=>'yaml', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'), 'grp3'=>array('one', 'two', 'three'));
         
         $parser = new YamlParser();
         $this->assertEquals($data, $parser->parse(CONFIGTEST_SUPPORT_PATH . '/test.yaml'));

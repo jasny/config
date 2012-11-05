@@ -29,6 +29,7 @@ class Config extends \stdClass
     static public $loaders = array(
         'file' => 'Jasny\Config\FileLoader',
         'dir' => 'Jasny\Config\DirLoader',
+        'mysqli' => 'Jasny\Config\MySQLParser',
         'ini' => 'Jasny\Config\IniParser',
         'json' => 'Jasny\Config\JsonParser',
         'yaml' => 'Jasny\Config\YamlParser'
@@ -100,10 +101,10 @@ class Config extends \stdClass
      */
     public function load($source, $options=array())
     {
-        if (strpos($source, ':') !== false) list($options['loader'], $source) = explode($source);
+        if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
         $loader = $this->getLoader($source, $options);
         
-        $data = $loader->load($file, $options);
+        $data = $loader->load($source, $options);
         if (!$data) return $this;
         
         foreach ($data as $key=>&$value) {

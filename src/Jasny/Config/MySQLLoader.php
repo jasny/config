@@ -31,7 +31,7 @@ class MySQLLoader implements Loader
     {
         if (!$connection instanceof \mysqli) {
             $options = parse_ini_string(str_replace(';', "\n", $connection)) + $options;
-            $connection = new \mysqli(isset($options['host']) ? $options['host'] : 'localhost', $options['user'], $options['password'], $options['dbname'], isset($options['port']) ? $options['port'] : null);
+            $connection = new \mysqli(isset($options['host']) ? $options['host'] : 'localhost', $options['username'], $options['password'], $options['dbname'], isset($options['port']) ? $options['port'] : null);
             if ($connection->connect_error) throw new \Exception("Failed to connect to db: " . $connection->connect_error);
         }
         

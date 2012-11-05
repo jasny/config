@@ -79,7 +79,7 @@ class MySQLLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $data = (object)array('opt1'=>'test', 'opt2'=>'jasny', 'grp1'=>(object)array('q'=>'mysqli', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'));
         
-        $dsn = "host=" . ini_get('mysqli.default_host') . ";user=" . (ini_get('mysqli.default_user') ?: 'root')  . ";password=" . ini_get('mysqli.default_pw')  . ";dbname=configtest";
+        $dsn = "host=" . ini_get('mysqli.default_host') . ";username=" . (ini_get('mysqli.default_user') ?: 'root')  . ";password=" . ini_get('mysqli.default_pw')  . ";dbname=configtest";
         $loader = new MySQLLoader();
         
         $this->assertEquals($data, $loader->load($dsn, array('query'=>"SELECT `option`, `value`, `group` FROM `settings`")));

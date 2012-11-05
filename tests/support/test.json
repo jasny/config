@@ -1,0 +1,16 @@
+{
+  "grp1" : {
+    "q" : "json",
+    "b" : 27
+  },
+  
+  "grp2" : {
+    "a" : "foobar"
+  },
+  
+  "grp3" : [
+      "one",
+      "two",
+      "three"
+  ]
+}

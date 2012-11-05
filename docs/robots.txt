@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: http://jasny.github.com/DB-MySQL/docs/sitemap.xml

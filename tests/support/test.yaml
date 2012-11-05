@@ -1,0 +1,9 @@
+grp1:
+   q : yaml
+   b : 27
+grp2:
+   a : foobar
+grp3:
+   - one
+   - two
+   - three

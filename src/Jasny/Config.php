@@ -32,7 +32,8 @@ class Config extends \stdClass
         'mysqli' => 'Jasny\Config\MySQLParser',
         'ini' => 'Jasny\Config\IniParser',
         'json' => 'Jasny\Config\JsonParser',
-        'yaml' => 'Jasny\Config\YamlParser'
+        'yaml' => 'Jasny\Config\YamlParser',
+        'yml' => 'Jasny\Config\YamlParser'
     );
     
     /**

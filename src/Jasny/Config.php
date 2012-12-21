@@ -17,10 +17,10 @@ namespace Jasny;
 class Config extends \stdClass
 {
     /**
-     * Singleton instance
+     * Multiton instances
      * @var Config
      */
-    private static $instance;
+    private static $instances;
 
     /**
      * Loader and parsers with classname.
@@ -37,14 +37,14 @@ class Config extends \stdClass
     );
     
     /**
-     * Get default instance
+     * Get a registered instance
      * 
      * @return Config
      */
-    static public function i()
+    static public function __callStatic($name, $arguments)
     {
-        if (!isset(self::$instance)) self::$instance = new static();
-        return self::$instance;
+        if (!isset(self::$instances[$name])) self::$instances[$name] = new static();
+        return self::$instances[$name];
     }
 
     

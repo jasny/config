@@ -2,7 +2,7 @@
     "name": "jasny/config",
     "description": "Configure your application. You can load .ini, .json and .yaml files or MySQL DB.",
     "keywords": ["config", "configuration", "ini", "json", "yaml", "db", "mysql"],
-    "version": "v1.1.0",
+    "version": "v1.1.1",
     "license": "MIT",
     "authors": [
         {

@@ -1,44 +1,65 @@
 <?php
-
+/**
+ * Jasny Config - Configure your application.
+ * 
+ * @author  Arnold Daniels <arnold@jasny.net>
+ * @license https://raw.github.com/jasny/config/master/LICENSE MIT
+ * @link    https://jasny.github.io/config
+ */
+/** */
 namespace Jasny\Config;
-
-use Jasny\Config;
-
-require_once 'Loader.php';
 
 /**
  * Load config from MySQL DB.
  * 
- * Options:
- *  - host      DB hostname (defaults to localhost)
- *  - username  DB username
- *  - password  DB password
- *  - port      DB port (defaults to 3306)
- *  - query     Something like "SELECT `option`, `value`, `group` FROM `settings`" (where `group` is optional)
- * 
- * @package Config
+ * @example <br/>
+ *   $db = new mysqli($host, $user, $pwd, $dbname);<br/>
+ *   Config::load($db, "SELECT `option`, `value`, `group` FROM `settings`"); // (`group` is optional)
  */
-class MySQLLoader implements Loader
+class MySQLLoader extends Loader
 {
     /**
-     * Load a config file
+     * Class constructor
+     * 
+     * @param string $query   Query string
+     */
+    public function __construct($query)
+    {
+        $options = is_string($query) ? compact('query') : $query;
+        parent::__construct($options);
+    }
+    
+    /**
+     * Load config from MySQL
      * 
      * @param \mysqli $connection  DB connection or DSN
-     * @param array   $options
      * @return object
      */
-    public function load($connection, $options=array())
+    public function load($connection)
     {
         if (!$connection instanceof \mysqli) {
-            $options = parse_ini_string(str_replace(';', "\n", $connection)) + $options;
-            $connection = new \mysqli(isset($options['host']) ? $options['host'] : 'localhost', $options['username'], $options['password'], $options['dbname'], isset($options['port']) ? $options['port'] : null);
-            if ($connection->connect_error) throw new \Exception("Failed to connect to db: " . $connection->connect_error);
+            trigger_error("Failed to load config: connection isn't a mysqli object", E_USER_WARNING);
+            return null;
         }
         
+        return $this->loadData($connection, $this->options['query']);
+    }
+    
+    /**
+     * Query MySQL DB
+     * 
+     * @param type $connection
+     * @param type $query
+     * @return type
+     */
+    protected function loadData($connection, $query)
+    {
         $data = (object)array();
         
-        $result = $connection->query($options['query']);
-        if (!$result) throw new \Exception("Config query failed: " . $connection->error);
+        try {
+            $result = $connection->query($query);
+        } catch (Excpetion $e) {}
+        if (!$result) trigger_error("Config query failed: " . $connection->error);
        
         while ($row = $result->fetch_row()) {
             list($key, $value, $group) = $row + array(3=>null);

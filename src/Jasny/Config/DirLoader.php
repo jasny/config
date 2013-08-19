@@ -1,59 +1,54 @@
 <?php
-
+/**
+ * Jasny Config - Configure your application.
+ * 
+ * @author  Arnold Daniels <arnold@jasny.net>
+ * @license https://raw.github.com/jasny/config/master/LICENSE MIT
+ * @link    https://jasny.github.io/config
+ */
+/** */
 namespace Jasny\Config;
 
 use Jasny\Config;
 
-require_once 'Loader.php';
-
 /**
  * Loader for directories with config files.
- * 
- * @package Config
  */
 class DirLoader implements Loader
 {
     /**
      * Load a config directory
      * 
-     * @param string $dir      Dirname
-     * @param array  $options
+     * @param string $dir
      * @return object
      */
-    public function load($dir, $options=array())
+    public function load($dir)
     {
         if (!is_dir($dir)) {
-            if (empty($options['optional'])) trigger_error("Config directory '$dir' does not exist", E_USER_WARNING);
+            if (empty($this->options['optional'])) {
+                trigger_error("Config directory '$dir' doesn't exist", E_USER_WARNING);
+            }
             return null;
         }
         
-        $data = (object)array();
+        $config = (object)array();
         
         foreach (scandir($dir) as $file) {
             if ($file[0] == '.') continue;
         
             if (is_dir("$dir/$file")) {
-                $data->$file = $this->load("$dir/$file", $options);
+                $data = $this->load("$dir/$file");
             } else {
-                if (isset($options['loader'])) {
-                    $loader = $options['loader'];
-                    if (strtolower(pathinfo($file, PATHINFO_EXTENSION)) != $loader) continue;
-                } else {
-                    $loader = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                }
-                
-                if (!isset(Config::$loaders[$loader])) continue;
-                
-                $class = Config::$loaders[$loader];
-                if (!new $class() instanceof Parser) continue;
-
+                $loader = static::getLoader("$dir/$file", $this->options);
+                $data = $loader->load("$dir/$file");
+            }
+            
+            if ($data) {
                 $key = pathinfo($file, PATHINFO_FILENAME);
-                $parser = new $class($options);
-                                
-                $data->$key = $parser->parse("$dir/$file");
+                Config::merge($config->$key, $data);
             }
         }
         
-        return $data;
+        return $config;
     }
 }

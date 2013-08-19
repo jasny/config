@@ -1,44 +1,49 @@
 <?php
+/**
+ * Jasny Config - Configure your application.
+ * 
+ * @author  Arnold Daniels <arnold@jasny.net>
+ * @license https://raw.github.com/jasny/config/master/LICENSE MIT
+ * @link    https://jasny.github.io/config
+ */
+/** */
 namespace Jasny\Config;
-
-require_once 'Parser.php';
 
 /**
  * Load and parse .json config files from a directory.
  *
  * @package Config
  */
-class JsonParser implements Parser
+class JsonLoader extends Loader
 {
-    /**
-     * Create parser
-     * 
-     * @param array $options  Not used
-     */
-    public function __construct($options=array())
-    { }
+    use LoadFile;
     
     /**
-     * Parse json file or string
+     * Parse json string
      *
-     * @param string $file  Filename
+     * @param string $input  JSON string
      * @return object
      */
-    public function parse($file)
+    public function parse($input)
     {
-        $json = file_get_contents($file);
-        $data = json_decode($json);
+        $data = json_decode($input);
         
-        if (json_last_error()) trigger_error("Failed to parse json file: " . $this->getJsonError(json_last_error()), E_USER_WARNING);
+        if (json_last_error()) trigger_error("Failed to parse json file: " .
+                $this->getJsonError(json_last_error()), E_USER_WARNING);
         return $data;
     }
     
-
-    private function getJsonError($errno)
+    /**
+     * Get an error message for a json error
+     * 
+     * @param int $errno
+     * @return string
+     */
+    protected function getJsonError($errno)
     {
-        switch (json_last_error()) {
+        switch ($errno) {
             case JSON_ERROR_NONE:
-                return 'No errors';
+                return 'No error';
             break;
             case JSON_ERROR_DEPTH:
                 return 'Maximum stack depth exceeded';

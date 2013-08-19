@@ -1,18 +1,37 @@
 <?php
-
+/**
+ * Jasny Config
+ * 
+ * @author  Arnold Daniels <arnold@jasny.net>
+ * @license https://raw.github.com/jasny/config/master/LICENSE MIT
+ * @link    https://jasny.github.io/config
+ */
+/** */
 namespace Jasny\Config;
 
 /**
  * Config loader
  */
-interface Loader
+abstract class Loader
 {
+    /** @var array */
+    protected $options;
+
     /**
-     * Load data
+     * Class constructor
      * 
-     * @param mixed $source   Filename or object
      * @param array $options  Additional options
+     */
+    public function __construct($options=[])
+    {
+        $this->options = (array)$options;
+    }
+    
+    /**
+     * Load configuration
+     * 
+     * @param string $key
      * @return object
      */
-    public function load($source, $options=array());
+    abstract public function load($key);
 }

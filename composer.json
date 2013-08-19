@@ -1,8 +1,7 @@
 {
     "name": "jasny/config",
-    "description": "Configure your application. You can load .ini, .json and .yaml files or MySQL DB.",
+    "description": "Configure your application. You can load .ini, .json, .yaml or .neon files or a MySQL DB.",
     "keywords": ["config", "configuration", "ini", "json", "yaml", "db", "mysql"],
-    "version": "v1.1.1",
     "license": "MIT",
     "authors": [
         {
@@ -17,6 +16,9 @@
     },
     "require": {
         "php": ">=5.3.0"
+    },
+    "suggests": {
+        "mustangostang/spyc": "To support YAML without the yaml or syck php extension"
     },
     "autoload": {
         "psr-0": {

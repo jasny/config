@@ -1,8 +1,10 @@
 <?php
 /**
- * Configure your application.
+ * Jasny Config - Configure your application.
  * 
- * @author Arnold Daniels
+ * @author  Arnold Daniels <arnold@jasny.net>
+ * @license https://raw.github.com/jasny/config/master/LICENSE MIT
+ * @link    https://jasny.github.io/config
  */
 /** */
 namespace Jasny;
@@ -26,19 +28,22 @@ class Config extends \stdClass
      * Loader and parsers with classname.
      * @var array
      */
-    static public $loaders = array(
-        'file' => 'Jasny\Config\FileLoader',
+    static public $loaders = [
         'dir' => 'Jasny\Config\DirLoader',
-        'mysqli' => 'Jasny\Config\MySQLParser',
-        'ini' => 'Jasny\Config\IniParser',
-        'json' => 'Jasny\Config\JsonParser',
-        'yaml' => 'Jasny\Config\YamlParser',
-        'yml' => 'Jasny\Config\YamlParser'
-    );
+        'mysqli' => 'Jasny\Config\MySQLLoader',
+        'ini' => 'Jasny\Config\IniLoader',
+        'json' => 'Jasny\Config\JsonLoader',
+        'neon' => 'Jasny\Config\NeonLoader',
+        'yaml' => 'Jasny\Config\YamlLoader',
+        'yml' => 'Jasny\Config\YamlLoader'
+    ];
+    
     
     /**
      * Get a registered instance
      * 
+     * @param string $name
+     * @param array  $arguments
      * @return Config
      */
     static public function __callStatic($name, $arguments)
@@ -51,46 +56,52 @@ class Config extends \stdClass
     /**
      * Create a new config interface.
      *
-     * @param string $source   Filename, source object or "loader:source"
-     * @param array  $options  Other options
+     * @param mixed $source   Configuration (array|object), filename (string), source object or "loader:source"
+     * @param array $options  Other options
      */
-    public function __construct($source=null, $options=array())
+    public function __construct($source=null, $options=[])
     {
-        if ($source || $options) $this->load($source, $options);
+        if (is_array($source) || $source instanceof stdClass) {
+            static::merge($this, $source);
+        } elseif (isset($source)) {
+            $this->load($source, $options);
+        }
     }
-
+    
     
     /**
-     * Get a loader for the specified source
+     * Get a loader for the specified source.
      * 
-     * @param type $source
-     * @param type $options
+     * @param mixed $source
+     * @param array $options
      * @return Config\Loader
      */
-    protected function getLoader($source, $options=array())
+    public static function getLoader($source, $options=[])
     {
         if (isset($options['loader'])) {
             $loader = $options['loader'];
         } elseif (is_object($source)) {
             foreach (self::$loaders as $cur=>$class) {
-                if ($class instanceof Config\Loader && is_a($source, $cur)) {
+                if (is_a($source, $cur)) {
                     $loader = $cur;
                     break;
                 }
             }
-            if (!isset($loader)) throw new \Exception("Don't know how to load config using " . get_class($source) . " object");
+            
+            if (!isset($loader)) {
+                trigger_error("Don't know how to load config using " . get_class($source) . " object", E_USER_WARNING);
+                return null;
+            }
+        } elseif (is_dir($source)) {
+            $loader = 'dir';
+        } else {
+            $loader = pathinfo($source, PATHINFO_EXTENSION);
         }
         
-        if (isset($loader)) {
-            if (!isset(self::$loaders[$loader])) throw new \Exception("Config loader '$loader' does not exist");
-            $class = self::$loaders[$loader];
-        }
+        if (!isset(self::$loaders[$loader])) throw new \Exception("Config loader '$loader' does not exist");
+        $class = self::$loaders[$loader];
         
-        if (!isset($class) || new $class() instanceof Config\Parser) {
-            $class = is_dir($source) ? self::$loaders['dir'] : self::$loaders['file'];
-        }
-        
-        return new $class();
+        return new $class($options);
     }
     
     /**
@@ -100,19 +111,39 @@ class Config extends \stdClass
      * @param array  $options  Other options
      * @return Config
      */
-    public function load($source, $options=array())
+    public function load($source, $options=[])
     {
         if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
-        $loader = $this->getLoader($source, $options);
+        $loader = static::getLoader($source, $options);
         
-        $data = $loader->load($source, $options);
+        $data = $loader->load($source);
         if (!$data) return $this;
         
-        foreach ($data as $key=>&$value) {
-            $this->$key = $value;
+        static::merge($this, $data);
+        return $this;
+    }
+    
+
+    /**
+     * Recursive merge of 2 objects
+     * 
+     * @param object $target
+     * @param object $data
+     */
+    public static function merge(&$target, $data)
+    {
+        if (!isset($target)) {
+            $target = $data;
+            return;
         }
         
-        return $this;
+        foreach ($data as $key=>&$value) {
+            if (isset($target->$key) && is_object($target->$key)) {
+                static::merge($target->$key, $value);
+            } else {
+                $target->$key = $value;
+            }
+        }
     }
     
     /**

@@ -98,7 +98,7 @@ class Config extends \stdClass
             $loader = pathinfo($source, PATHINFO_EXTENSION);
         }
         
-        if (!isset(self::$loaders[$loader])) throw new \Exception("Config loader '$loader' does not exist");
+        if (!isset(self::$loaders[$loader])) return null;
         $class = self::$loaders[$loader];
         
         return new $class($options);
@@ -116,8 +116,10 @@ class Config extends \stdClass
         if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
         $loader = static::getLoader($source, $options);
         
-        $data = $loader->load($source);
-        if (!$data) return $this;
+        if ($loader) $data = $loader->load($source);
+         else trigger_error("Config loader '$loader' does not exist", E_USER_WARNING);
+        
+        if (!isset($data)) return $this;
         
         static::merge($this, $data);
         return $this;

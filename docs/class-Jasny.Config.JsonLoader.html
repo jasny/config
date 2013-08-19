@@ -4,7 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="generator" content="ApiGen 2.8.0" />
 
-	<title>Class Jasny\Config\MySQLLoader | Jasny Config · API documentation</title>
+	<title>Class Jasny\Config\JsonLoader | Jasny Config · API documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
 	<script type="text/javascript" src="elementlist.js?1474248797"></script>
@@ -37,9 +37,9 @@
 			<ul>
 				<li><a href="class-Jasny.Config.DirLoader.html">DirLoader</a></li>
 				<li><a href="class-Jasny.Config.IniLoader.html">IniLoader</a></li>
-				<li><a href="class-Jasny.Config.JsonLoader.html">JsonLoader</a></li>
+				<li class="active"><a href="class-Jasny.Config.JsonLoader.html">JsonLoader</a></li>
 				<li><a href="class-Jasny.Config.Loader.html">Loader</a></li>
-				<li class="active"><a href="class-Jasny.Config.MySQLLoader.html">MySQLLoader</a></li>
+				<li><a href="class-Jasny.Config.MySQLLoader.html">MySQLLoader</a></li>
 				<li><a href="class-Jasny.Config.NeonEntity.html">NeonEntity</a></li>
 				<li><a href="class-Jasny.Config.NeonLoader.html">NeonLoader</a></li>
 				<li><a href="class-Jasny.Config.YamlLoader.html">YamlLoader</a></li>
@@ -89,12 +89,12 @@
 	</div>
 
 <div id="content" class="class">
-	<h1>Class MySQLLoader</h1>
+	<h1>Class JsonLoader</h1>
 
 
 	<div class="description">
 	
-<p>Load config from MySQL DB.</p>
+<p>Load and parse .json config files from a directory.</p>
 
 	</div>
 
@@ -107,8 +107,10 @@
 		</dd>
 		<dd style="padding-left:30px">
 			<img src="resources/inherit.png" alt="Extended by" />
-<b><span>Jasny\Config\MySQLLoader</span></b>			
+<b><span>Jasny\Config\JsonLoader</span></b>			
 			
+			 uses 
+				<a href="class-Jasny.Config.LoadFile.html"><span>Jasny\Config\LoadFile</span></a>
 			
 		</dd>
 	</dl>
@@ -124,67 +126,21 @@
 		
 		
 		<b>Namespace:</b> <a href="namespace-Jasny.html">Jasny</a>\<a href="namespace-Jasny.Config.html">Config</a><br />
-		
+		<b>Package:</b> Config<br />
 
 				<b>License:</b>
 				<a href="https://raw.github.com/jasny/config/master/LICENSE">MIT</a><br />
 				<b>Author:</b>
 				Arnold Daniels &lt;<a
 href="mailto:arnold&#64;jasny.net">arnold&#64;<!---->jasny.net</a>&gt;<br />
-				<b>Example:</b>
-				<br />
-$db = new mysqli($host, $user, $pwd, $dbname);<br />
-Config::load($db, "SELECT <code>option</code>, <code>value</code>,
-<code>group</code> FROM <code>settings</code>"); // (<code>group</code> is
-optional)<br />
-		<b>Located at</b> <a href="source-class-Jasny.Config.MySQLLoader.html#12-77" title="Go to source code">Jasny/Config/MySQLLoader.php</a><br />
+		<b>Located at</b> <a href="source-class-Jasny.Config.JsonLoader.html#12-68" title="Go to source code">Jasny/Config/JsonLoader.php</a><br />
 	</div>
 
 
 
 	<table class="summary" id="methods">
 	<caption>Methods summary</caption>
-	<tr data-order="__construct" id="___construct">
-
-		<td class="attributes"><code>
-			 public 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Jasny.Config.MySQLLoader.html#21-30" title="Go to source code">__construct</a>( <span>string <var>$query</var></span> )</code>
-
-		<div class="description short">
-			
-<p>Class constructor</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Class constructor</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$query</var></dt>
-					<dd><code>string</code><br>$query Query string</dd>
-				</dl></div>
-
-
-
-
-				<h4>Overrides</h4>
-				<div class="list"><code><a href="class-Jasny.Config.Loader.html#___construct">Jasny\Config\Loader::__construct()</a></code></div>
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="load" id="_load">
+	<tr data-order="parse" id="_parse">
 
 		<td class="attributes"><code>
 			 public 
@@ -194,25 +150,25 @@ optional)<br />
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_load">#</a>
-		<code><a href="source-class-Jasny.Config.MySQLLoader.html#32-46" title="Go to source code">load</a>( <span>mysqli <var>$connection</var></span> )</code>
+		<a class="anchor" href="#_parse">#</a>
+		<code><a href="source-class-Jasny.Config.JsonLoader.html#21-34" title="Go to source code">parse</a>( <span>string <var>$input</var></span> )</code>
 
 		<div class="description short">
 			
-<p>Load config from MySQL</p>
+<p>Parse json string</p>
 
 		</div>
 
 		<div class="description detailed hidden">
 			
-<p>Load config from MySQL</p>
+<p>Parse json string</p>
 
 
 
 				<h4>Parameters</h4>
 				<div class="list"><dl>
-					<dt><var>$connection</var></dt>
-					<dd><code>mysqli</code><br>$connection DB connection or DSN</dd>
+					<dt><var>$input</var></dt>
+					<dd><code>string</code><br>$input JSON string</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
@@ -228,7 +184,24 @@ optional)<br />
 	</tr>
 	</table>
 
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Jasny.Config.Loader.html#methods">Jasny\Config\Loader</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Jasny.Config.Loader.html#___construct">__construct()</a>, 
+			<a href="class-Jasny.Config.Loader.html#_load">load()</a>
+		</code></td>
+	</tr>
+	</table>
 
+	<table class="summary used">
+	<caption>Methods used from <a href="class-Jasny.Config.LoadFile.html#methods">Jasny\Config\LoadFile</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Jasny.Config.LoadFile.html#_load">()</a>
+		</code></td>
+	</tr>
+	</table>
 
 
 

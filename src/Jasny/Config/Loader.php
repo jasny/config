@@ -15,7 +15,7 @@ namespace Jasny\Config;
 abstract class Loader
 {
     /** @var array */
-    protected $options;
+    public $options;
 
     /**
      * Class constructor

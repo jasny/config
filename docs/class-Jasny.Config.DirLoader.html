@@ -4,23 +4,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="generator" content="ApiGen 2.8.0" />
 
-	<title>Class Jasny\Config\DirLoader | Config · API documentation</title>
+	<title>Class Jasny\Config\DirLoader | Jasny Config · API documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?3330873321"></script>
+	<script type="text/javascript" src="elementlist.js?1474248797"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
-	<script type="text/javascript">
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', "UA-32388850-5"]);
-		_gaq.push(['_trackPageview']);
-
-		(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();
-	</script>
 </head>
 
 <body>
@@ -34,7 +23,7 @@
 			<ul>
 				<li class="active"><a href="namespace-Jasny.html">Jasny<span></span></a>
 						<ul>
-				<li class="active main"><a href="namespace-Jasny.Config.html">Config</a>
+				<li class="active"><a href="namespace-Jasny.Config.html">Config</a>
 						</li>
 							</ul></li>
 			</ul>
@@ -47,19 +36,20 @@
 			<h3>Classes</h3>
 			<ul>
 				<li class="active"><a href="class-Jasny.Config.DirLoader.html">DirLoader</a></li>
-				<li><a href="class-Jasny.Config.FileLoader.html">FileLoader</a></li>
-				<li><a href="class-Jasny.Config.IniParser.html">IniParser</a></li>
-				<li><a href="class-Jasny.Config.JsonParser.html">JsonParser</a></li>
-				<li><a href="class-Jasny.Config.MySQLLoader.html">MySQLLoader</a></li>
-				<li><a href="class-Jasny.Config.YamlParser.html">YamlParser</a></li>
-			</ul>
-
-			<h3>Interfaces</h3>
-			<ul>
+				<li><a href="class-Jasny.Config.IniLoader.html">IniLoader</a></li>
+				<li><a href="class-Jasny.Config.JsonLoader.html">JsonLoader</a></li>
 				<li><a href="class-Jasny.Config.Loader.html">Loader</a></li>
-				<li><a href="class-Jasny.Config.Parser.html">Parser</a></li>
+				<li><a href="class-Jasny.Config.MySQLLoader.html">MySQLLoader</a></li>
+				<li><a href="class-Jasny.Config.NeonEntity.html">NeonEntity</a></li>
+				<li><a href="class-Jasny.Config.NeonLoader.html">NeonLoader</a></li>
+				<li><a href="class-Jasny.Config.YamlLoader.html">YamlLoader</a></li>
 			</ul>
 
+
+			<h3>Traits</h3>
+			<ul>
+				<li><a href="class-Jasny.Config.LoadFile.html">LoadFile</a></li>
+			</ul>
 
 
 
@@ -110,9 +100,14 @@
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
+			<a href="class-Jasny.Config.Loader.html"><span>Jasny\Config\Loader</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by" />
 <b><span>Jasny\Config\DirLoader</span></b>			
-			 implements 
-				<a href="class-Jasny.Config.Loader.html"><span>Jasny\Config\Loader</span></a>
 			
 			
 		</dd>
@@ -129,9 +124,14 @@
 		
 		
 		<b>Namespace:</b> <a href="namespace-Jasny.html">Jasny</a>\<a href="namespace-Jasny.Config.html">Config</a><br />
-		<b>Package:</b> Config<br />
+		
 
-		<b>Located at</b> <a href="source-class-Jasny.Config.DirLoader.html#9-59" title="Go to source code">Jasny/Config/DirLoader.php</a><br />
+				<b>License:</b>
+				<a href="https://raw.github.com/jasny/config/master/LICENSE">MIT</a><br />
+				<b>Author:</b>
+				Arnold Daniels &lt;<a
+href="mailto:arnold&#64;jasny.net">arnold&#64;<!---->jasny.net</a>&gt;<br />
+		<b>Located at</b> <a href="source-class-Jasny.Config.DirLoader.html#14-56" title="Go to source code">Jasny/Config/DirLoader.php</a><br />
 	</div>
 
 
@@ -149,7 +149,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_load">#</a>
-		<code><a href="source-class-Jasny.Config.DirLoader.html#16-58" title="Go to source code">load</a>( <span>string <var>$dir</var></span>, <span>array <var>$options</var> = <span class="php-keyword1">array</span>()</span> )</code>
+		<code><a href="source-class-Jasny.Config.DirLoader.html#19-55" title="Go to source code">load</a>( <span>string <var>$dir</var></span> )</code>
 
 		<div class="description short">
 			
@@ -166,9 +166,7 @@
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$dir</var></dt>
-					<dd><code>string</code><br>$dir Dirname</dd>
-					<dt><var>$options</var></dt>
-					<dd><code>array</code><br>$options</dd>
+					<dd><code>string</code><br>$dir</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
@@ -179,10 +177,17 @@
 
 
 
-				<h4>Implementation of</h4>
-				<div class="list"><code><a href="class-Jasny.Config.Loader.html#_load">Jasny\Config\Loader::load()</a></code></div>
 		</div>
 		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Jasny.Config.Loader.html#methods">Jasny\Config\Loader</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Jasny.Config.Loader.html#___construct">__construct()</a>
+		</code></td>
 	</tr>
 	</table>
 
@@ -197,7 +202,14 @@
 
 
 
-
+	<table class="summary inherited">
+	<caption>Properties inherited from <a href="class-Jasny.Config.Loader.html#properties">Jasny\Config\Loader</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Jasny.Config.Loader.html#$options"><var>$options</var></a>
+		</code></td>
+	</tr>
+	</table>
 
 
 
@@ -206,7 +218,7 @@
 </div>
 
 	<div id="footer">
-		Config · API documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+		Jasny Config · API documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
 	</div>
 </div>
 </div>

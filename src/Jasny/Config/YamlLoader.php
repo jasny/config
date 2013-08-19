@@ -12,20 +12,54 @@ namespace Jasny\Config;
 use Jasny\Config;
 
 /**
- * Load and parse .yaml config files from a directory.
+ * Load and parse yaml config files.
+ * 
+ * Options:
+ *   use: Force the use of 'yaml', 'syck' or 'spyc'  
  *
  * @package Config
  */
-class YamlParser implements Parser
+class YamlLoader extends Loader
 {
-    /**
-     * Create parser
-     * 
-     * @param array $options  Not used
-     */
-    public function __construct($options=array())
-    { }
+    use LoadFile;
     
+    /**
+     * Create Loader
+     * 
+     * @param array $options
+     */
+    public function __construct($options=[])
+    {
+        if (empty($options['use'])) {
+            $options['use'] = null;
+            
+            if (function_exists('yaml_parse')) $options['use'] = 'yaml';
+             elseif (function_exists('syck_load')) $options['use'] = 'syck';
+             elseif (class_exists('Spyc')) $options['use'] = 'spyc';
+             else trigger_error("To use yaml files you need the yaml or syck extension or the Spyc library."
+                     , E_USER_WARNING);
+        }
+        
+        parent::__construct($options);
+    }
+    
+    
+    /**
+     * Load a yaml file
+     * 
+     * @param string $file
+     */
+    public function loadFile($file)
+    {
+        switch ($this->options['use']) {
+            case 'yaml': $data = yaml_parse_file($file); break;
+            case 'syck': $data = syck_load(file_get_contents($file)); break;
+            case 'spyc': $data = \Spyc::YAMLLoad($file); break;
+            default: return null;
+        }
+        
+        return Config::objectify($data);
+    }
     
     /**
      * Parse yaml string
@@ -35,14 +69,11 @@ class YamlParser implements Parser
      */
     public function parse($input)
     {
-        if (function_exists('yaml_parse')) {
-            $data = yaml_parse($input);
-        } elseif (function_exists('syck_load')) {
-            $data = syck_load($input);
-        } elseif (class_exists('Spyc')) {
-            $data = Spyc::load($input);
-        } else {
-            throw new \Exception("Unable to parse a yaml file. Need the yaml or syck extension or the spyc library.");
+        switch ($this->options['use']) {
+            case 'yaml': $data = yaml_parse($input); break;
+            case 'syck': $data = syck_load($input); break;
+            case 'spyc': $data = \Spyc::YAMLLoadString($input); break;
+            default: return null;
         }
         
         return Config::objectify($data);

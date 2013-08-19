@@ -67,6 +67,6 @@ trait LoadFile
     protected function loadFile($file)
     {
         $input = file_get_contents($file);
-        return $this->pase($input);
+        return $this->parse($input);
     }
 }

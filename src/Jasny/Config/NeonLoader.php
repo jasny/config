@@ -317,7 +317,7 @@ class NeonLoader
 /**
  * Representation of 'foo(bar=1)' literal
  */
-class NeonEntity extends stdClass
+class NeonEntity extends \stdClass
 {
     public $value;
     public $attributes;

@@ -1,34 +1,28 @@
 <?php
-
+/**
+ * Jasny Config - Configure your application.
+ * 
+ * @author  Arnold Daniels <arnold@jasny.net>
+ * @license https://raw.github.com/jasny/config/master/LICENSE MIT
+ * @link    https://jasny.github.io/config
+ */
+/** */
 namespace Jasny\Config;
 
 use Jasny\Config;
 
 /**
- * Parser stub
- */
-class DirTestParser implements Parser
-{
-    static public $options;
-    static public $data;
-    
-    public function __construct($options = array())
-    {
-        self::$options = $options;
-    }
-    
-    public function parse($input)
-    {
-        $input = preg_replace('/^' . preg_quote(CONFIGTEST_SUPPORT_PATH . '/test/', '/') . '|\.test$/', '', $input);
-        return self::$data[$input];
-    }
-}
-
-/**
  * Test for Jasny\Config\DirLoader
+ * 
+ * @package Test
  */
 class DirLoaderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var DirLoader;
+     */
+    protected $loader;
+    
     /**
      * This method is called before the first test of this test class is run.
      */
@@ -36,75 +30,98 @@ class DirLoaderTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUpBeforeClass();
         
-        Config::$loaders['test'] = 'Jasny\Config\DirTestParser';
-        DirTestParser::$data = array('grp1' => (object)array('q'=>'abc', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'), 'grp3'=>array('one', 'two', 'three'), 'section1/foo'=>'ABC', 'section1/bar'=>'XYZ');
+        DirTestLoader::$data = [
+            'grp1' => (object)['q'=>'abc', 'b'=>27],
+            'grp2' => (object)['a'=>'foobar'],
+            'grp3' => array('one', 'two', 'three'),
+            'section1/foo'=>'ABC',
+            'section1/bar'=>'XYZ'
+        ];
     }
     
     /**
-     * Test using test parser
+     * This method is called before a test is executed.
+     */
+    protected function setUp()
+    {
+        Config::$loaders['test'] = 'Jasny\Config\DirTestLoader';
+        $this->loader = new DirLoader();
+    }
+    
+    /**
+     * This method is called after a test is executed.
+     */
+    protected function tearDown()
+    {
+        unset(Config::$loaders['test']);
+        $this->loader = null;
+        
+        DirTestLoader::reset();
+    }
+    
+    
+    /**
+     * Test using test loader
      * @covers Jasny\Config\DirLoader::Load()
      */
     public function testLoad()
     {
-        $options = array('opts1'=>99, 'opt2'=>true);
-        $data = (object)array('grp1' => (object)array('q'=>'abc', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'), 'grp3'=>array('one', 'two', 'three'), 'section1'=>(object)array('foo'=>'ABC', 'bar'=>'XYZ'));
+        $data = (object)[
+            'grp1' => (object)['q'=>'abc', 'b'=>27],
+            'grp2' => (object)['a'=>'foobar'],
+            'grp3' => array('one', 'two', 'three'),
+            'section1'=>(object)['foo'=>'ABC', 'bar'=>'XYZ']
+        ];
         
-        $loader = new DirLoader();
-        $result = $loader->load(CONFIGTEST_SUPPORT_PATH . '/test', $options);
-        
-        $this->assertEquals(DirTestParser::$options, $options);
+        $result = $this->loader->load(CONFIGTEST_SUPPORT_PATH . '/test');
         $this->assertEquals($data, $result);
     }
 
     /**
-     * Test using json parser
-     * @covers Jasny\Config\DirLoader::Load()
+     * Test using any kind of Loader
      */
     public function testLoad_Any()
     {
-        $data = (object)array('grp1'=>(object)array('q'=>'abc', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'), 'grp3'=>array('one', 'two', 'three'));
+        $data = (object)[
+            'grp1' => (object)['q'=>'abc', 'b'=>27],
+            'grp2' => (object)['a'=>'foobar'],
+            'grp3' => ['one', 'two', 'three']
+        ];
         
-        $loader = new DirLoader();
-        $result = $loader->load(CONFIGTEST_SUPPORT_PATH . '/test-any');
-        
-        $this->assertEquals($data, $result);
-    }
-    
-    /**
-     * Test using ini parser
-     * @covers Jasny\Config\DirLoader::Load()
-     */
-    public function testLoad_Ini()
-    {
-        $data = (object)array('grp1'=>(object)array('q'=>'abc', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'));
-        
-        $loader = new DirLoader();
-        $result = $loader->load(CONFIGTEST_SUPPORT_PATH . '/test-any', array('loader'=>'ini'));
+        $result = $this->loader->load(CONFIGTEST_SUPPORT_PATH . '/test-any');
         
         $this->assertEquals($data, $result);
     }
 
-    /**
-     * Test using json parser
-     * @covers Jasny\Config\DirLoader::Load()
-     */
-    public function testLoad_Json()
-    {
-        $data = (object)array('grp3'=>array('one', 'two', 'three'));
-        
-        $loader = new DirLoader();
-        $result = $loader->load(CONFIGTEST_SUPPORT_PATH . '/test-any', array('loader'=>'json'));
-        
-        $this->assertEquals($data, $result);
-    }
-    
     /**
      * Test loading a non-existant file
      * @covers Jasny\Config\DirLoader::Load()
      */
     public function testLoad_Optional()
     {
-        $loader = new DirLoader();
-        $this->assertNull($loader->load(uniqid() . '.fake', array('optional'=>true)));
+        $this->loader->options['optional'] = true;
+        $result = $this->loader->load(uniqid() . '.fake');
+        
+        $this->assertNull($result);
+    }
+}
+
+/**
+ * File loader stub
+ * @ignore
+ */
+class DirTestLoader extends Loader
+{
+    static public $data;
+    
+    public function load($file)
+    {
+        $key = preg_replace('/^' . preg_quote(CONFIGTEST_SUPPORT_PATH . '/test/', '/') . '|\.test$/', '', $file);
+        return self::$data[$key];
+    }
+    
+    public static function reset()
+    {
+        self::$data = null;
     }
 }

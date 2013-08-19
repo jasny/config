@@ -1,8 +1,13 @@
 <?php
-
+/**
+ * Jasny Config - Configure your application.
+ * 
+ * @author  Arnold Daniels <arnold@jasny.net>
+ * @license https://raw.github.com/jasny/config/master/LICENSE MIT
+ * @link    https://jasny.github.io/config
+ */
+/** */
 namespace Jasny\Config;
-
-use Jasny\Config;
 
 /**
  * Test for Jasny\Config\MySQLLoader
@@ -10,42 +15,31 @@ use Jasny\Config;
 class MySQLLoaderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * Create new databases.
+     * Database connection
+     * @var \mysqli
      */
-    protected static function createDB()
-    {
-        // Setup DB
-        $m = new \mysqli(ini_get('mysqli.default_host'), ini_get('mysqli.default_user') ?: 'root', ini_get('mysqli.default_pw'));
-        if ($m->connect_error) throw new \PHPUnit_Framework_SkippedTestError("Failed to connect to mysql: " . $m->connect_error);
-
-        $queries = array(
-            "CREATE DATABASE `configtest`",
-            "USE `configtest`",
-            "CREATE TABLE `settings` (`option` VARCHAR(32) NOT NULL, `value` VARCHAR(255) NOT NULL, `group` VARCHAR(32) DEFAULT NULL)",
-            "INSERT INTO `settings` VALUES ('opt1', 'test', NULL), ('opt2', 'jasny', NULL), ('q', 'mysqli', 'grp1'), ('b', 27, 'grp1'), ('a', 'foobar', 'grp2')");
-        
-        foreach ($queries as $query) {
-            if (!$m->query($query)) throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise DBs: " . $m->error);
-        }
-    }
-
-    /**
-     * Drop databases.
-     * Please call dropDB if you've modified data.
-     */
-    protected static function dropDB()
-    {
-        $m = new \mysqli(ini_get('mysqli.default_host'), ini_get('mysqli.default_user') ?: 'root', ini_get('mysqli.default_pw'));
-        if (!$m->connect_error) $m->query("DROP DATABASE IF EXISTS `configtest`");
-    }
-
+    static protected $db;
+    
     /**
      * This method is called before the first test of this test class is run.
      */
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        self::createDB();
+        
+        // Setup DB
+        self::$db = new \mysqli(ini_get('mysqli.default_host'), ini_get('mysqli.default_user') ?: 'root', ini_get('mysqli.default_pw'));
+        if (self::$db->connect_error) throw new \PHPUnit_Framework_SkippedTestError("Failed to connect to mysql: " . self::$db->connect_error);
+
+        $queries = array(
+            "CREATE DATABASE `jasny_config_test`",
+            "USE `jasny_config_test`",
+            "CREATE TABLE `settings` (`option` VARCHAR(32) NOT NULL, `value` VARCHAR(255) NOT NULL, `group` VARCHAR(32) DEFAULT NULL)",
+            "INSERT INTO `settings` VALUES ('opt1', 'test', NULL), ('opt2', 'jasny', NULL), ('q', 'mysqli', 'grp1'), ('b', 27, 'grp1'), ('a', 'foobar', 'grp2')");
+        
+        foreach ($queries as $query) {
+            if (!self::$db->query($query)) throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise DBs: " . self::$db->error);
+        }
     }
     
     /**
@@ -53,35 +47,27 @@ class MySQLLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public static function tearDownAfterClass()
     {
-        self::dropDB();
+        self::$db->query("DROP DATABASE IF EXISTS `jasny_config_test`");
+        self::$db = null;
+        
         parent::tearDownAfterClass();
     }
 
     /**
      * Test with existing DB connection
-     * @covers Jasny\Config\MySQLLoader()
      */
     public function testLoad()
     {
-        $data = (object)array('opt1'=>'test', 'opt2'=>'jasny', 'grp1'=>(object)array('q'=>'mysqli', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'));
+        $data = (object)[
+            'opt1'=>'test',
+            'opt2'=>'jasny',
+            'grp1'=>(object)['q'=>'mysqli', 'b'=>27],
+            'grp2'=>(object)['a'=>'foobar']
+        ];
         
-        $m = new \mysqli(ini_get('mysqli.default_host'), ini_get('mysqli.default_user') ?: 'root', ini_get('mysqli.default_pw'), 'configtest');
-        $loader = new MySQLLoader();
+        $loader = new MySQLLoader("SELECT `option`, `value`, `group` FROM `settings`");
+        $result = $loader->load(self::$db);
         
-        $this->assertEquals($data, $loader->load($m, array('query'=>"SELECT `option`, `value`, `group` FROM `settings`")));
-    }
-
-    /**
-     * Test and create a DB connection
-     * @covers Jasny\Config\MySQLLoader()
-     */
-    public function testLoad_DSN()
-    {
-        $data = (object)array('opt1'=>'test', 'opt2'=>'jasny', 'grp1'=>(object)array('q'=>'mysqli', 'b'=>27), 'grp2'=>(object)array('a'=>'foobar'));
-        
-        $dsn = "host=" . ini_get('mysqli.default_host') . ";username=" . (ini_get('mysqli.default_user') ?: 'root')  . ";password=" . ini_get('mysqli.default_pw')  . ";dbname=configtest";
-        $loader = new MySQLLoader();
-        
-        $this->assertEquals($data, $loader->load($dsn, array('query'=>"SELECT `option`, `value`, `group` FROM `settings`")));
+        $this->assertEquals($data, $result);
     }
 }

@@ -4,23 +4,12 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta name="generator" content="ApiGen 2.8.0" />
 
-	<title>Class Jasny\Config | Config · API documentation</title>
+	<title>Class Jasny\Config | Jasny Config · API documentation</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?3330873321"></script>
+	<script type="text/javascript" src="elementlist.js?1474248797"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
-	<script type="text/javascript">
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', "UA-32388850-5"]);
-		_gaq.push(['_trackPageview']);
-
-		(function() {
-			var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-			ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		})();
-	</script>
 </head>
 
 <body>
@@ -34,7 +23,7 @@
 			<ul>
 				<li class="active"><a href="namespace-Jasny.html">Jasny<span></span></a>
 						<ul>
-				<li class="main"><a href="namespace-Jasny.Config.html">Config</a>
+				<li><a href="namespace-Jasny.Config.html">Config</a>
 						</li>
 							</ul></li>
 			</ul>
@@ -127,16 +116,19 @@ stdClass
 		<b>Namespace:</b> <a href="namespace-Jasny.html">Jasny</a><br />
 		<b>Package:</b> Config<br />
 
+				<b>License:</b>
+				<a href="https://raw.github.com/jasny/config/master/LICENSE">MIT</a><br />
 				<b>Author:</b>
-				Arnold Daniels<br />
-		<b>Located at</b> <a href="source-class-Jasny.Config.html#10-133" title="Go to source code">Jasny/Config.php</a><br />
+				Arnold Daniels &lt;<a
+href="mailto:arnold&#64;jasny.net">arnold&#64;<!---->jasny.net</a>&gt;<br />
+		<b>Located at</b> <a href="source-class-Jasny.Config.html#12-168" title="Go to source code">Jasny/Config.php</a><br />
 	</div>
 
 
 
 	<table class="summary" id="methods">
 	<caption>Methods summary</caption>
-	<tr data-order="i" id="_i">
+	<tr data-order="__callStatic" id="___callStatic">
 
 		<td class="attributes"><code>
 			 public static
@@ -146,21 +138,28 @@ stdClass
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_i">#</a>
-		<code><a href="source-class-Jasny.Config.html#37-46" title="Go to source code">i</a>( )</code>
+		<a class="anchor" href="#___callStatic">#</a>
+		<code><a href="source-class-Jasny.Config.html#42-53" title="Go to source code">__callStatic</a>( <span>string <var>$name</var></span>, <span>array <var>$arguments</var></span> )</code>
 
 		<div class="description short">
 			
-<p>Get default instance</p>
+<p>Get a registered instance</p>
 
 		</div>
 
 		<div class="description detailed hidden">
 			
-<p>Get default instance</p>
+<p>Get a registered instance</p>
 
 
 
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$name</var></dt>
+					<dd><code>string</code><br>$name</dd>
+					<dt><var>$arguments</var></dt>
+					<dd><code>array</code><br>$arguments</dd>
+				</dl></div>
 
 				<h4>Returns</h4>
 				<div class="list">
@@ -184,7 +183,7 @@ stdClass
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Jasny.Config.html#49-58" title="Go to source code">__construct</a>( <span>string <var>$source</var> = <span class="php-keyword1">null</span></span>, <span>array <var>$options</var> = <span class="php-keyword1">array</span>()</span> )</code>
+		<code><a href="source-class-Jasny.Config.html#56-69" title="Go to source code">__construct</a>( <span>mixed <var>$source</var> = <span class="php-keyword1">null</span></span>, <span>array <var>$options</var> = []</span> )</code>
 
 		<div class="description short">
 			
@@ -201,11 +200,56 @@ stdClass
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$source</var></dt>
-					<dd><code>string</code><br>$source Filename, source object or "loader:source"</dd>
+					<dd><code>mixed</code><br>$source Configuration (array|object), filename (string), source object or
+"loader:source"</dd>
 					<dt><var>$options</var></dt>
 					<dd><code>array</code><br>$options Other options</dd>
 				</dl></div>
 
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getLoader" id="_getLoader">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-Jasny.Config.Loader.html">Jasny\Config\Loader</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getLoader">#</a>
+		<code><a href="source-class-Jasny.Config.html#72-105" title="Go to source code">getLoader</a>( <span>mixed <var>$source</var></span>, <span>array <var>$options</var> = []</span> )</code>
+
+		<div class="description short">
+			
+<p>Get a loader for the specified source.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Get a loader for the specified source.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$source</var></dt>
+					<dd><code>mixed</code><br>$source</dd>
+					<dt><var>$options</var></dt>
+					<dd><code>array</code><br>$options</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Jasny.Config.Loader.html">Jasny\Config\Loader</a></code></code><br />
+				</div>
 
 
 
@@ -224,7 +268,7 @@ stdClass
 
 		<td class="name"><div>
 		<a class="anchor" href="#_load">#</a>
-		<code><a href="source-class-Jasny.Config.html#94-114" title="Go to source code">load</a>( <span>string <var>$source</var></span>, <span>array <var>$options</var> = <span class="php-keyword1">array</span>()</span> )</code>
+		<code><a href="source-class-Jasny.Config.html#107-126" title="Go to source code">load</a>( <span>string <var>$source</var></span>, <span>array <var>$options</var> = []</span> )</code>
 
 		<div class="description short">
 			
@@ -257,6 +301,46 @@ stdClass
 		</div>
 		</div></td>
 	</tr>
+	<tr data-order="merge" id="_merge">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_merge">#</a>
+		<code><a href="source-class-Jasny.Config.html#129-149" title="Go to source code">merge</a>( <span>object <var>&amp; $target</var></span>, <span>object <var>$data</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Recursive merge of 2 objects</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Recursive merge of 2 objects</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$target</var></dt>
+					<dd><code>object</code><br>$target</dd>
+					<dt><var>$data</var></dt>
+					<dd><code>object</code><br>$data</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
 	<tr data-order="objectify" id="_objectify">
 
 		<td class="attributes"><code>
@@ -268,7 +352,7 @@ stdClass
 
 		<td class="name"><div>
 		<a class="anchor" href="#_objectify">#</a>
-		<code><a href="source-class-Jasny.Config.html#116-132" title="Go to source code">objectify</a>( <span>array <var>$data</var></span> )</code>
+		<code><a href="source-class-Jasny.Config.html#151-167" title="Go to source code">objectify</a>( <span>array <var>$data</var></span> )</code>
 
 		<div class="description short">
 			
@@ -321,15 +405,17 @@ stdClass
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Jasny.Config.html#25-35" title="Go to source code"><var>$loaders</var></a>
+				<a href="source-class-Jasny.Config.html#27-39" title="Go to source code"><var>$loaders</var></a>
 		</td>
-		<td class="value"><code><span class="php-keyword1">array</span>(
-    <span class="php-quote">'file'</span> =&gt; <span class="php-quote">'Jasny\Config\FileLoader'</span>,
+		<td class="value"><code>[
     <span class="php-quote">'dir'</span> =&gt; <span class="php-quote">'Jasny\Config\DirLoader'</span>,
-    <span class="php-quote">'ini'</span> =&gt; <span class="php-quote">'Jasny\Config\IniParser'</span>,
-    <span class="php-quote">'json'</span> =&gt; <span class="php-quote">'Jasny\Config\JsonParser'</span>,
-    <span class="php-quote">'yaml'</span> =&gt; <span class="php-quote">'Jasny\Config\YamlParser'</span>
-)</code></td>
+    <span class="php-quote">'mysqli'</span> =&gt; <span class="php-quote">'Jasny\Config\MySQLLoader'</span>,
+    <span class="php-quote">'ini'</span> =&gt; <span class="php-quote">'Jasny\Config\IniLoader'</span>,
+    <span class="php-quote">'json'</span> =&gt; <span class="php-quote">'Jasny\Config\JsonLoader'</span>,
+    <span class="php-quote">'neon'</span> =&gt; <span class="php-quote">'Jasny\Config\NeonLoader'</span>,
+    <span class="php-quote">'yaml'</span> =&gt; <span class="php-quote">'Jasny\Config\YamlLoader'</span>,
+    <span class="php-quote">'yml'</span> =&gt; <span class="php-quote">'Jasny\Config\YamlLoader'</span>
+]</code></td>
 		<td class="description"><div>
 			<a href="#$loaders" class="anchor">#</a>
 
@@ -357,7 +443,7 @@ stdClass
 </div>
 
 	<div id="footer">
-		Config · API documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+		Jasny Config · API documentation API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
 	</div>
 </div>
 </div>

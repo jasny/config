@@ -14,7 +14,7 @@ use Jasny\Config;
 /**
  * Loader for directories with config files.
  */
-class DirLoader implements Loader
+class DirLoader extends Loader
 {
     /**
      * Load a config directory
@@ -39,7 +39,9 @@ class DirLoader implements Loader
             if (is_dir("$dir/$file")) {
                 $data = $this->load("$dir/$file");
             } else {
-                $loader = static::getLoader("$dir/$file", $this->options);
+                $loader = Config::getLoader("$dir/$file", $this->options);
+                if (!$loader) continue;
+                
                 $data = $loader->load("$dir/$file");
             }
             

@@ -15,7 +15,10 @@
         "source": "https://github.com/jasny/Config"
     },
     "require": {
-        "php": ">=5.3.0"
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+        "mustangostang/spyc": "0.*"
     },
     "suggests": {
         "mustangostang/spyc": "To support YAML without the yaml or syck php extension"

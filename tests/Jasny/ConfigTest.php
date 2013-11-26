@@ -44,15 +44,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     
     
     /**
-     * Test using a static Config instance
-     */
-    public function testI()
-    {
-        $c = Config::i();
-        $this->assertSame($c, Config::i());
-    }
-    
-    /**
      * Test Jasny\Config::getLoader()
      */
     public function testGetLoader()

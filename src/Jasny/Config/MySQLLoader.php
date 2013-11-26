@@ -12,9 +12,11 @@ namespace Jasny\Config;
 /**
  * Load config from MySQL DB.
  * 
- * @example <br/>
+ * <code>
  *   $db = new mysqli($host, $user, $pwd, $dbname);<br/>
- *   Config::load($db, "SELECT `option`, `value`, `group` FROM `settings`"); // (`group` is optional)
+ *   $config = new Jasny\Config();
+ *   $config->load($db, "SELECT `option`, `value`, `group` FROM `settings`"); // (`group` is optional)
+ * </code>
  */
 class MySQLLoader extends Loader
 {

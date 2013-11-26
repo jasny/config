@@ -19,12 +19,6 @@ namespace Jasny;
 class Config extends \stdClass
 {
     /**
-     * Multiton instances
-     * @var Config
-     */
-    private static $instances;
-
-    /**
      * Loader and parsers with classname.
      * @var array
      */
@@ -37,20 +31,6 @@ class Config extends \stdClass
         'yaml' => 'Jasny\Config\YamlLoader',
         'yml' => 'Jasny\Config\YamlLoader'
     ];
-    
-    
-    /**
-     * Get a registered instance
-     * 
-     * @param string $name
-     * @param array  $arguments
-     * @return Config
-     */
-    static public function __callStatic($name, $arguments)
-    {
-        if (!isset(self::$instances[$name])) self::$instances[$name] = new static();
-        return self::$instances[$name];
-    }
 
     
     /**

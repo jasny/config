@@ -10,6 +10,7 @@
 namespace Jasny\Config;
 
 use Jasny\Config;
+use Symfony\Component\Yaml\Yaml as Symfony_Yaml;
 
 /**
  * Load and parse yaml config files.
@@ -35,9 +36,10 @@ class YamlLoader extends Loader
             
             if (function_exists('yaml_parse')) $options['use'] = 'yaml';
              elseif (function_exists('syck_load')) $options['use'] = 'syck';
+             elseif (class_exists('Symfony\Component\Yaml\Yaml')) $options['use'] = 'symfony';
              elseif (class_exists('Spyc')) $options['use'] = 'spyc';
-             else trigger_error("To use yaml files you need the yaml or syck extension or the Spyc library."
-                     , E_USER_WARNING);
+             else trigger_error("To use yaml files you need the yaml or syck extension, the Symfony YAML component " .
+                 "or the Spyc library.", E_USER_WARNING);
         }
         
         parent::__construct($options);
@@ -54,6 +56,7 @@ class YamlLoader extends Loader
         switch ($this->options['use']) {
             case 'yaml': $data = yaml_parse_file($file); break;
             case 'syck': $data = syck_load(file_get_contents($file)); break;
+            case 'symfony': $data = Symfony_Yaml::parse(file_get_contents($file)); break;
             case 'spyc': $data = \Spyc::YAMLLoad($file); break;
             default: return null;
         }
@@ -72,6 +75,7 @@ class YamlLoader extends Loader
         switch ($this->options['use']) {
             case 'yaml': $data = yaml_parse($input); break;
             case 'syck': $data = syck_load($input); break;
+            case 'symfony': $data = Symfony_Yaml::parse($input); break;
             case 'spyc': $data = \Spyc::YAMLLoadString($input); break;
             default: return null;
         }

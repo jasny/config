@@ -18,7 +18,8 @@
         "php": ">=5.4.0"
     },
     "require-dev": {
-        "mustangostang/spyc": "0.*"
+        "mustangostang/spyc": "0.*",
+	"symfony/yaml": "2.*"
     },
     "suggests": {
         "mustangostang/spyc": "To support YAML without the yaml or syck php extension"

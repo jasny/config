@@ -75,6 +75,16 @@ YAML;
     }
     
     /**
+     * Test parsing a string using Symfony
+     */
+    public function testParse_Symfony()
+    {
+        $this->loader = new YamlLoader(['use'=>'symfony']);
+        $result = $this->loader->parse(self::$yaml);
+        $this->assertEquals($this->getTestData(), $result);
+    }
+    
+    /**
      * Test parsing a string using Spyc
      */
     public function testParse_Spyc()

@@ -22,7 +22,7 @@
 	"symfony/yaml": "2.*"
     },
     "suggests": {
-        "mustangostang/spyc": "To support YAML without the yaml or syck php extension"
+        "symfony/yaml": "To support YAML without the yaml or syck php extension"
     },
     "autoload": {
         "psr-0": {

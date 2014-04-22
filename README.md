@@ -1,7 +1,7 @@
 Jasny's Config class
 ====================
 
-[![Build Status](https://secure.travis-ci.org/jasny/Config.png?branch=master)](http://travis-ci.org/jasny/Config)
+[![Build Status](https://secure.travis-ci.org/jasny/config.png?branch=master)](http://travis-ci.org/jasny/config)
 
 Configure your application. You can load .ini, .json and .yaml files or MySQL DB.
 

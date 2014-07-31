@@ -120,7 +120,7 @@ class Config extends \stdClass
         }
         
         foreach ($data as $key=>&$value) {
-            if (isset($target->$key) && is_object($target->$key)) {
+            if (isset($target->$key) && is_object($value) && is_object($target->$key)) {
                 static::merge($target->$key, $value);
             } else {
                 $target->$key = $value;

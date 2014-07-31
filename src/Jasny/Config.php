@@ -93,7 +93,20 @@ class Config extends \stdClass
      */
     public function load($source, $options=[])
     {
-        if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
+        /**
+         * Support windows platforms
+         */
+        if('winnt' == strtolower(PHP_OS)){
+            if(count(explode(':', $source))==3){
+                $exploded = explode(':', $source);
+                $options['loader'] = $exploded[0];
+                unset($exploded[0]);
+                $source = implode(':',$exploded);
+            }
+        }else{
+            if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
+        }
+
         $loader = static::getLoader($source, $options);
         
         if ($loader) $data = $loader->load($source);

@@ -72,7 +72,7 @@ class NeonLoader
     public function parse($input)
     {
         if (!is_string($input)) {
-            throw new InvalidArgumentException("Argument must be a string, " . gettype($input) . " given.");
+            throw new \InvalidArgumentException("Argument must be a string, " . gettype($input) . " given.");
         }
         if (!self::$re) {
             self::$re = '~(' . implode(')|(', self::$patterns) . ')~Amix';
@@ -119,7 +119,7 @@ class NeonLoader
     protected function parseString($indent = null, $result = null)
     {
         $inlineParser = $indent === null;
-        $value = $key = $object = null;
+        $value = $key = null;
         $hasValue = $hasKey = false;
         $tokens = $this->tokens;
         $n = & $this->n;
@@ -245,7 +245,7 @@ class NeonLoader
                     $value = $t * 1;
                 } elseif (preg_match('#\d\d\d\d-\d\d?-\d\d?(?:(?:[Tt]| +)\d\d?:\d\d:\d\d(?:\.\d*)? ' .
                         '*(?:Z|[-+]\d\d?(?::\d\d)?)?)?\z#A', $t)) {
-                    $value = new DateTime($t);
+                    $value = new \DateTime($t);
                 } else { // literal
                     $value = $t;
                 }
@@ -314,11 +314,3 @@ class NeonLoader
     }
 }
 
-/**
- * Representation of 'foo(bar=1)' literal
- */
-class NeonEntity extends \stdClass
-{
-    public $value;
-    public $attributes;
-}

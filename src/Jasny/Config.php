@@ -41,7 +41,7 @@ class Config extends \stdClass
      */
     public function __construct($source=null, $options=[])
     {
-        if (is_array($source) || $source instanceof stdClass) {
+        if (is_array($source) || $source instanceof \stdClass) {
             static::merge($this, $source);
         } elseif (isset($source)) {
             $this->load($source, $options);

@@ -60,8 +60,10 @@ class MySQLLoader extends Loader
         
         try {
             $result = $connection->query($query);
-        } catch (Excpetion $e) {}
-        if (!$result) trigger_error("Config query failed: " . $connection->error);
+            if (!$result) trigger_error("Config query failed: " . $connection->error, E_USER_WARNING);
+        } catch (\Excpetion $e) {
+            trigger_error("Config query failed: " . $e->getMessage(), E_USER_WARNING);
+        }
        
         while ($row = $result->fetch_row()) {
             list($key, $value, $group) = $row + array(3=>null);

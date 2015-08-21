@@ -20,10 +20,12 @@
     "require-dev": {
         "mustangostang/spyc": "0.*",
       	"symfony/yaml": "2.*",
+        "nette/neon": "^2.3",
         "satooshi/php-coveralls": "dev-master"
     },
     "suggest": {
-        "symfony/yaml": "To support YAML without the yaml or syck php extension"
+        "symfony/yaml": "To support YAML without the yaml or syck php extension",
+        "nette/neon": "Required to use the NEON notation"        
     },
     "autoload": {
         "psr-0": {

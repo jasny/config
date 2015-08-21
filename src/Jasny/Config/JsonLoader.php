@@ -41,6 +41,8 @@ class JsonLoader extends Loader
      */
     protected function getJsonError($errno)
     {
+        if (!is_int($errno)) $errno = 9999;
+    
         switch ($errno) {
             case JSON_ERROR_NONE:
                 return 'No error';

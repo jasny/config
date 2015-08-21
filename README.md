@@ -2,6 +2,8 @@ Jasny's Config class
 ====================
 
 [![Build Status](https://secure.travis-ci.org/jasny/config.png?branch=master)](http://travis-ci.org/jasny/config)
+[![Coverage Status](https://coveralls.io/repos/jasny/config/badge.svg?branch=master&service=github)](https://coveralls.io/github/jasny/config?branch=master)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/9d9ee2fe-1622-4883-b46e-aa21b14a3931/mini.png)](https://insight.sensiolabs.com/projects/9d9ee2fe-1622-4883-b46e-aa21b14a3931)
 
 Configure your application. You can load .ini, .json and .yaml files or MySQL DB.
 
@@ -25,3 +27,4 @@ the file from the 'src' folder.
 ## API documentation (generated) ##
 
 http://jasny.github.com/Config/docs
+

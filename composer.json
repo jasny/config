@@ -19,7 +19,8 @@
     },
     "require-dev": {
         "mustangostang/spyc": "0.*",
-      	"symfony/yaml": "2.*"
+      	"symfony/yaml": "2.*",
+        "satooshi/php-coveralls": "dev-master"
     },
     "suggest": {
         "symfony/yaml": "To support YAML without the yaml or syck php extension"
@@ -28,5 +29,8 @@
         "psr-0": {
             "Jasny\\Config": "src/"
         }
+    },
+    "config": {
+        "use-include-path": true
     }
 }

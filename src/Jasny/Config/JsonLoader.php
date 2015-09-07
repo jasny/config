@@ -1,7 +1,7 @@
 <?php
 /**
  * Jasny Config - Configure your application.
- * 
+ *
  * @author  Arnold Daniels <arnold@jasny.net>
  * @license https://raw.github.com/jasny/config/master/LICENSE MIT
  * @link    https://jasny.github.io/config
@@ -35,7 +35,7 @@ class JsonLoader extends Loader
     
     /**
      * Get an error message for a json error
-     * 
+     *
      * @param int $errno
      * @return string
      */
@@ -65,6 +65,6 @@ class JsonLoader extends Loader
             default:
                 return 'Unknown error';
             break;
-        }        
+        }
     }
 }

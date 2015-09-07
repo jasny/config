@@ -1,7 +1,7 @@
 <?php
 /**
  * Jasny Config - Configure your application.
- * 
+ *
  * @author  Arnold Daniels <arnold@jasny.net>
  * @license https://raw.github.com/jasny/config/master/LICENSE MIT
  * @link    https://jasny.github.io/config
@@ -18,7 +18,7 @@ class DirLoader extends Loader
 {
     /**
      * Load a config directory
-     * 
+     *
      * @param string $dir
      * @return object
      */

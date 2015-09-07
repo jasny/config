@@ -1,7 +1,7 @@
 <?php
 /**
  * Jasny Config - Configure your application.
- * 
+ *
  * @author  Arnold Daniels <arnold@jasny.net>
  * @license https://raw.github.com/jasny/config/master/LICENSE MIT
  * @link    https://jasny.github.io/config
@@ -11,7 +11,7 @@ namespace Jasny\Config;
 
 /**
  * Load config from MySQL DB.
- * 
+ *
  * <code>
  *   $db = new mysqli($host, $user, $pwd, $dbname);<br/>
  *   $config = new Jasny\Config();
@@ -22,7 +22,7 @@ class MySQLLoader extends Loader
 {
     /**
      * Class constructor
-     * 
+     *
      * @param string $query   Query string
      */
     public function __construct($query)
@@ -33,7 +33,7 @@ class MySQLLoader extends Loader
     
     /**
      * Load config from MySQL
-     * 
+     *
      * @param \mysqli $connection  DB connection or DSN
      * @return object
      */
@@ -49,7 +49,7 @@ class MySQLLoader extends Loader
     
     /**
      * Query MySQL DB
-     * 
+     *
      * @param type $connection
      * @param type $query
      * @return type

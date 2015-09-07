@@ -1,7 +1,7 @@
 <?php
 /**
  * Jasny Config
- * 
+ *
  * @author  Arnold Daniels <arnold@jasny.net>
  * @license https://raw.github.com/jasny/config/master/LICENSE MIT
  * @link    https://jasny.github.io/config
@@ -19,17 +19,17 @@ abstract class Loader
 
     /**
      * Class constructor
-     * 
+     *
      * @param array $options  Additional options
      */
-    public function __construct($options=[])
+    public function __construct($options = [])
     {
         $this->options = (array)$options;
     }
     
     /**
      * Load configuration
-     * 
+     *
      * @param string $key
      * @return object
      */

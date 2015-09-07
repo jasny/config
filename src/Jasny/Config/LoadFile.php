@@ -1,7 +1,7 @@
 <?php
 /**
  * Jasny Config
- * 
+ *
  * @author  Arnold Daniels <arnold@jasny.net>
  * @license https://raw.github.com/jasny/config/master/LICENSE MIT
  * @link    https://jasny.github.io/config
@@ -18,7 +18,7 @@ trait LoadFile
 {
     /**
      * Load a config file or directory
-     * 
+     *
      * @param string $file
      * @return object
      */
@@ -35,7 +35,7 @@ trait LoadFile
     
     /**
      * Load all files in a directory
-     *  
+     *
      * @param type $dir
      * @return type
      */
@@ -60,7 +60,7 @@ trait LoadFile
     
     /**
      * Load the configuration from a file
-     * 
+     *
      * @param type $file
      * @return type
      */

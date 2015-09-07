@@ -1,7 +1,7 @@
 <?php
 /**
  * Jasny Config - Configure your application.
- * 
+ *
  * @author  Arnold Daniels <arnold@jasny.net>
  * @license https://raw.github.com/jasny/config/master/LICENSE MIT
  * @link    https://jasny.github.io/config
@@ -11,9 +11,9 @@ namespace Jasny;
 
 /**
  * Load a configuration settings.
- * 
+ *
  * Note: You need to use an autoloader of include loaders manualy.
- * 
+ *
  * @package Config
  */
 class Config extends \stdClass
@@ -39,7 +39,7 @@ class Config extends \stdClass
      * @param mixed $source   Configuration (array|object), filename (string), source object or "loader:source"
      * @param array $options  Other options
      */
-    public function __construct($source=null, $options=[])
+    public function __construct($source = null, $options = [])
     {
         if (is_array($source) || $source instanceof \stdClass) {
             static::merge($this, $source);
@@ -51,17 +51,17 @@ class Config extends \stdClass
     
     /**
      * Get a loader for the specified source.
-     * 
+     *
      * @param mixed $source
      * @param array $options
      * @return Config\Loader
      */
-    public static function getLoader($source, $options=[])
+    public static function getLoader($source, $options = [])
     {
         if (isset($options['loader'])) {
             $loader = $options['loader'];
         } elseif (is_object($source)) {
-            foreach (self::$loaders as $cur=>$class) {
+            foreach (self::$loaders as $cur => $class) {
                 if (is_a($source, $cur)) {
                     $loader = $cur;
                     break;
@@ -91,19 +91,19 @@ class Config extends \stdClass
      * @param array  $options  Other options
      * @return Config
      */
-    public function load($source, $options=[])
+    public function load($source, $options = [])
     {
         /**
          * Support windows platforms
          */
-        if('winnt' == strtolower(PHP_OS)){
-            if(count(explode(':', $source))==3){
+        if ('winnt' == strtolower(PHP_OS)) {
+            if (count(explode(':', $source))==3) {
                 $exploded = explode(':', $source);
                 $options['loader'] = $exploded[0];
                 unset($exploded[0]);
-                $source = implode(':',$exploded);
+                $source = implode(':', $exploded);
             }
-        }else{
+        } else {
             if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
         }
 
@@ -121,7 +121,7 @@ class Config extends \stdClass
 
     /**
      * Recursive merge of 2 objects
-     * 
+     *
      * @param object $target
      * @param object $data
      */
@@ -132,7 +132,7 @@ class Config extends \stdClass
             return;
         }
         
-        foreach ($data as $key=>&$value) {
+        foreach ($data as $key => &$value) {
             if (isset($target->$key) && is_object($value) && is_object($target->$key)) {
                 static::merge($target->$key, $value);
             } else {
@@ -143,7 +143,7 @@ class Config extends \stdClass
     
     /**
      * Turn associated array to object
-     * 
+     *
      * @param array $data
      * @return object
      */

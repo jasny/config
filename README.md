@@ -22,9 +22,9 @@ use Jasny\Config;
 
 $env = getenv('APPLICATION_ENV') ?: 'prod';
 
-Config::i()->load('settings.yaml');
-Config::i()->db = new Config('db.ini');
-Config::i()->env = $env;
-Config::i()->load("$env.yaml", array('optional'=>true));
+$config = new Config('settings.yml');
+$config->db = new Config('db.ini');
+$config->env = $env;
+$config->load("$env.yml", array('optional'=>true)); // Overwrites existing settings
 ```
 

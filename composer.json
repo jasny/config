@@ -18,10 +18,10 @@
         "php": ">=5.4.0"
     },
     "require-dev": {
+        "jasny/php-code-quality": "^1.1",
         "mustangostang/spyc": "0.*",
       	"symfony/yaml": "2.*",
-        "nette/neon": "^2.3",
-        "satooshi/php-coveralls": "dev-master"
+        "nette/neon": "^2.3"
     },
     "suggest": {
         "symfony/yaml": "To support YAML without the yaml or syck php extension",

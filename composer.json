@@ -15,7 +15,8 @@
         "source": "https://github.com/jasny/Config"
     },
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "aws/aws-sdk-php": "2.*"
     },
     "require-dev": {
         "jasny/php-code-quality": "^1.1",

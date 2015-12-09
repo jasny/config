@@ -24,6 +24,7 @@ class Config extends \stdClass
      */
     static public $loaders = [
         'dir' => 'Jasny\Config\DirLoader',
+        'Aws\DynamoDb\DynamoDbClient' => 'Jasny\Config\DynamoDBLoader',
         'mysqli' => 'Jasny\Config\MySQLLoader',
         'ini' => 'Jasny\Config\IniLoader',
         'json' => 'Jasny\Config\JsonLoader',
@@ -36,7 +37,8 @@ class Config extends \stdClass
     /**
      * Create a new config interface.
      *
-     * @param mixed $source   Configuration (array|object), filename (string), source object or "loader:source"
+     * @param mixed $source   Configuration (array|object), filename (string), source o
+     * bject or "loader:source"
      * @param array $options  Other options
      */
     public function __construct($source = null, $options = [])
@@ -104,7 +106,9 @@ class Config extends \stdClass
                 $source = implode(':', $exploded);
             }
         } else {
-            if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
+            if(is_string($source)) {
+                if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
+            }
         }
 
         $loader = static::getLoader($source, $options);

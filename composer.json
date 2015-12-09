@@ -15,14 +15,14 @@
         "source": "https://github.com/jasny/Config"
     },
     "require": {
-        "php": ">=5.4.0",
-        "aws/aws-sdk-php": "2.*"
+        "php": ">=5.4.0"
     },
     "require-dev": {
         "jasny/php-code-quality": "^1.1",
         "mustangostang/spyc": "0.*",
       	"symfony/yaml": "2.*",
-        "nette/neon": "^2.3"
+        "nette/neon": "^2.3",
+        "aws/aws-sdk-php": "2.*"
     },
     "suggest": {
         "symfony/yaml": "To support YAML without the yaml or syck php extension",

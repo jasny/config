@@ -11,6 +11,8 @@ services:
 install:
   - composer install
   - wget https://scrutinizer-ci.com/ocular.phar -O "$HOME/ocular.phar"
+  - nvm use 0.10 && node --version && npm install -g dynalite
+  - sudo pip install virtualenv && (cd test && make supervisord && ./venv/bin/supervisorctl start dynalite)
   
 script:
   - vendor/bin/phpunit --coverage-clover cache/logs/clover.xml

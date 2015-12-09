@@ -36,8 +36,14 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         parent::setUpBeforeClass();
 
         self::$dynamodb = DynamoDbClient::factory([
-            'region'       => 'eu-west-1'
+            'region' => 'eu-west-1',
+            'endpoint' => 'http://localhost:4567',
+            'credentials' => array(
+                'key'    => 'YOUR_AWS_ACCESS_KEY_ID',
+                'secret' => 'YOUR_AWS_SECRET_ACCESS_KEY',
+            )
         ]);
+
         self::$dynamodb->createTable(array(
             'TableName' => self::TABLE_NAME,
             'AttributeDefinitions' => array(

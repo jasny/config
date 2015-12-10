@@ -36,8 +36,8 @@ trait LoadFile
     /**
      * Load all files in a directory
      *
-     * @param type $dir
-     * @return type
+     * @param string $dir
+     * @return object
      */
     protected function loadDir($dir)
     {
@@ -61,8 +61,8 @@ trait LoadFile
     /**
      * Load the configuration from a file
      *
-     * @param type $file
-     * @return type
+     * @param string $file
+     * @return object
      */
     protected function loadFile($file)
     {
@@ -70,3 +70,4 @@ trait LoadFile
         return $this->parse($input);
     }
 }
+

@@ -118,9 +118,11 @@ JSON;
         $this->assertEquals('Unexpected control character found', $fn->invoke($this->loader, JSON_ERROR_CTRL_CHAR));
         $this->assertEquals('Syntax error, malformed JSON', $fn->invoke($this->loader, JSON_ERROR_SYNTAX));
         $this->assertEquals('Malformed UTF-8 characters, possibly incorrectly encoded',
-            $fn->invoke($this->loader, JSON_ERROR_UTF8));
+            $fn->invoke($this->loader, JSON_ERROR_UTF8)
+        );
         $this->assertEquals('Unknown error', $fn->invoke($this->loader, 9999));
         $this->assertEquals('Unknown error', $fn->invoke($this->loader, 'foo'));
     }
 }
+
 

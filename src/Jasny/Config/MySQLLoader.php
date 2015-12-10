@@ -50,9 +50,9 @@ class MySQLLoader extends Loader
     /**
      * Query MySQL DB
      *
-     * @param type $connection
-     * @param type $query
-     * @return type
+     * @param \mysqli $connection
+     * @param string $query
+     * @return object
      */
     protected function loadData($connection, $query)
     {
@@ -61,7 +61,7 @@ class MySQLLoader extends Loader
         try {
             $result = $connection->query($query);
             if (!$result) trigger_error("Config query failed: " . $connection->error, E_USER_WARNING);
-        } catch (\Excpetion $e) {
+        } catch (\Exception $e) {
             trigger_error("Config query failed: " . $e->getMessage(), E_USER_WARNING);
         }
        
@@ -79,3 +79,4 @@ class MySQLLoader extends Loader
         return $data;
     }
 }
+

@@ -28,8 +28,11 @@ class JsonLoader extends Loader
     {
         $data = json_decode($input);
         
-        if (json_last_error()) trigger_error("Failed to parse json file: " .
-                $this->getJsonError(json_last_error()), E_USER_WARNING);
+        if (json_last_error()) {
+            $msg = "Failed to parse json file: " . $this->getJsonError(json_last_error());
+            trigger_error($msg, E_USER_WARNING);
+        }
+        
         return $data;
     }
     
@@ -46,25 +49,19 @@ class JsonLoader extends Loader
         switch ($errno) {
             case JSON_ERROR_NONE:
                 return 'No error';
-            break;
             case JSON_ERROR_DEPTH:
                 return 'Maximum stack depth exceeded';
-            break;
             case JSON_ERROR_STATE_MISMATCH:
                 return 'Underflow or the modes mismatch';
-            break;
             case JSON_ERROR_CTRL_CHAR:
                 return 'Unexpected control character found';
-            break;
             case JSON_ERROR_SYNTAX:
                 return 'Syntax error, malformed JSON';
-            break;
             case JSON_ERROR_UTF8:
                 return 'Malformed UTF-8 characters, possibly incorrectly encoded';
-            break;
             default:
                 return 'Unknown error';
-            break;
         }
     }
 }
+

@@ -26,7 +26,8 @@
     },
     "suggest": {
         "symfony/yaml": "To support YAML without the yaml or syck php extension",
-        "nette/neon": "Required to use the NEON notation"        
+        "nette/neon": "Required to use the NEON notation",
+        "aws/aws-sdk-php": "Required to load configuration from AWS DynamoDB"
     },
     "autoload": {
         "psr-0": {

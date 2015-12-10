@@ -24,6 +24,6 @@ dynamodblocalclean:
 	rm -rf dynamodb_local
 
 supervisordclean:
-	rm -f supervisord.log
+	rm -f supervisord.log supervisord.pid
 
 cleanall: venvclean dynamodblocalclean supervisordclean

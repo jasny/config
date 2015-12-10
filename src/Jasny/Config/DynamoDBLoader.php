@@ -68,3 +68,4 @@ class DynamoDBLoader extends Loader
         return $data['settings'];
     }
 }
+

@@ -43,7 +43,9 @@ class Config extends \stdClass
      */
     public function __construct($source = null, $options = [])
     {
-        if (is_array($source) || $source instanceof \stdClass) {
+        if (is_array($source)) $source = static::objectify($source);
+        
+        if ($source instanceof \stdClass) {
             static::merge($this, $source);
         } elseif (isset($source)) {
             $this->load($source, $options);
@@ -95,30 +97,29 @@ class Config extends \stdClass
      */
     public function load($source, $options = [])
     {
-        /**
-         * Support windows platforms
-         */
+        // Support windows platforms
         if ('winnt' == strtolower(PHP_OS)) {
-            if (count(explode(':', $source))==3) {
+            if (count(explode(':', $source)) === 3) {
                 $exploded = explode(':', $source);
                 $options['loader'] = $exploded[0];
                 unset($exploded[0]);
                 $source = implode(':', $exploded);
             }
-        } else {
-            if(is_string($source)) {
-                if (strpos($source, ':') !== false) list($options['loader'], $source) = explode(':', $source);
-            }
+        } elseif (is_string($source) && strpos($source, ':') !== false) {
+            list($options['loader'], $source) = explode(':', $source);
         }
 
         $loader = static::getLoader($source, $options);
+        if (!$loader) {
+            trigger_error("Config loader '$loader' does not exist", E_USER_WARNING);
+            return $this;
+        }
         
-        if ($loader) $data = $loader->load($source);
-         else trigger_error("Config loader '$loader' does not exist", E_USER_WARNING);
+        $data = $loader->load($source);
+        if (isset($data)) {
+            static::merge($this, $data);
+        }
         
-        if (!isset($data)) return $this;
-        
-        static::merge($this, $data);
         return $this;
     }
     
@@ -160,6 +161,7 @@ class Config extends \stdClass
         foreach ($data as &$item) {
             $item = self::objectify($item);
         }
+        
         return $data;
     }
 }

@@ -28,8 +28,12 @@ class MySQLLoaderTest extends \PHPUnit_Framework_TestCase
         parent::setUpBeforeClass();
         
         // Setup DB
-        self::$db = new \mysqli(ini_get('mysqli.default_host'), ini_get('mysqli.default_user') ?: 'root', ini_get('mysqli.default_pw'));
-        if (self::$db->connect_error) throw new \PHPUnit_Framework_SkippedTestError("Failed to connect to mysql: " . self::$db->connect_error);
+        mysqli_report(MYSQLI_REPORT_STRICT);
+        try {
+            self::$db = new \mysqli(ini_get('mysqli.default_host'), ini_get('mysqli.default_user') ?: 'root', ini_get('mysqli.default_pw'));
+        } catch (\mysqli_sql_exception $e) {
+            throw new \PHPUnit_Framework_SkippedTestError("Failed to connect to mysql: " . $e->getMessage());
+        }
 
         $queries = array(
             "CREATE DATABASE `jasny_config_test`",
@@ -38,7 +42,11 @@ class MySQLLoaderTest extends \PHPUnit_Framework_TestCase
             "INSERT INTO `settings` VALUES ('opt1', 'test', NULL), ('opt2', 'jasny', NULL), ('q', 'mysqli', 'grp1'), ('b', 27, 'grp1'), ('a', 'foobar', 'grp2')");
         
         foreach ($queries as $query) {
-            if (!self::$db->query($query)) throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise DBs: " . self::$db->error);
+            try {
+                self::$db->query($query);
+            } catch (\mysqli_sql_exception $e) {
+                throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise DBs: " . $e->getMessage());
+            }
         }
     }
     

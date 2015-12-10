@@ -11,6 +11,7 @@ namespace Jasny\Config;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Marshaler;
+use Guzzle\Http\Exception\CurlException;
 use Jasny\Config;
 
 /**
@@ -28,6 +29,103 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
      */
     const TABLE_NAME = 'jasny-config-test';
     
+    
+    /**
+     * Connect to dynamodb
+     */
+    protected static function connect()
+    {
+        self::$dynamodb = DynamoDbClient::factory([
+            'region' => 'local',
+            'endpoint' => 'http://localhost:4567',
+            'credentials' => [
+                'key'    => 'none',
+                'secret' => 'none',
+            ],
+            'request.options' => [
+                'connect_timeout' => 3
+            ],
+            'client.backoff' => false
+        ]);
+    }
+    
+    /**
+     * Create the table
+     */
+    protected static function createTable($wait = false)
+    {
+        $tables = self::$dynamodb->listTables();
+        if (in_array(self::TABLE_NAME, $tables['TableNames'])) {
+            self::deleteTable(true);
+        }
+        
+        self::$dynamodb->createTable([
+            'TableName' => self::TABLE_NAME,
+            'AttributeDefinitions' => [
+                [
+                    'AttributeName' => 'key',
+                    'AttributeType' => 'S'
+                ]
+            ],
+            'KeySchema' => [
+                [
+                    'AttributeName' => 'key',
+                    'KeyType'       => 'HASH'
+                ]
+            ],
+            'ProvisionedThroughput' => [
+                'ReadCapacityUnits'  => 1,
+                'WriteCapacityUnits' => 1
+            ]
+        ]);
+        
+        if (!$wait) return;
+        
+        self::$dynamodb->waitUntil('TableExists', [
+            'TableName' => self::TABLE_NAME
+        ]);
+    }
+    
+    /**
+     * Delete the table
+     *
+     * @param boolean $wait  Wait until the table is deleted
+     */
+    protected static function deleteTable($wait = false)
+    {
+        self::$dynamodb->deleteTable([
+            'TableName' => self::TABLE_NAME
+        ]);
+        
+        if (!$wait) return;
+        
+        self::$dynamodb->waitUntil('TableNotExists', [
+            'TableName' => self::TABLE_NAME
+        ]);
+    }
+    
+    /**
+     * Fill the table with data
+     */
+    protected static function fillTable()
+    {
+        $data = [
+            'key' => 'dev',
+            'settings' => array(
+                'db' => 'test'
+            )
+        ];
+
+        $marshaler = new Marshaler();
+        $item = $marshaler->marshalItem($data);
+
+        self::$dynamodb->putItem([
+            'TableName' => self::TABLE_NAME,
+            'Item' => $item
+        ]);
+    }
+    
+    
     /**
      * This method is called before the first test of this test class is run.
      */
@@ -35,53 +133,13 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
     {
         parent::setUpBeforeClass();
 
-        self::$dynamodb = DynamoDbClient::factory([
-            'region' => 'eu-west-1',
-            'endpoint' => 'http://localhost:4567',
-            'credentials' => array(
-                'key'    => 'YOUR_AWS_ACCESS_KEY_ID',
-                'secret' => 'YOUR_AWS_SECRET_ACCESS_KEY',
-            )
-        ]);
-
-        self::$dynamodb->createTable(array(
-            'TableName' => self::TABLE_NAME,
-            'AttributeDefinitions' => array(
-                array(
-                    'AttributeName' => 'key',
-                    'AttributeType' => 'S'
-                )
-            ),
-            'KeySchema' => array(
-                array(
-                    'AttributeName' => 'key',
-                    'KeyType'       => 'HASH'
-                )
-            ),
-            'ProvisionedThroughput' => array(
-                'ReadCapacityUnits'  => 1,
-                'WriteCapacityUnits' => 1
-            )
-        ));
-
-        self::$dynamodb->waitUntil('TableExists', array(
-            'TableName' => self::TABLE_NAME
-        ));
-
-        $data = [
-            'key' => 'dev',
-            'settings' => array(
-                'db'=>'test'
-            )
-        ];
-
-        $marshaler = new Marshaler();
-        $item = $marshaler->marshalItem($data);
-
-        self::$dynamodb->putItem(array(
-            'TableName' => self::TABLE_NAME,
-            'Item' => $item
-        ));
+        try {
+            self::connect();
+            self::createTable(true);
+            self::fillTable();
+        } catch (CurlException $e) {
+            throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise local dynamodb. Is dynalite running on localhost:4567?");
+        }
     }
     
     /**
@@ -89,12 +147,13 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public static function tearDownAfterClass()
     {
-        self::$dynamodb->deleteTable(array(
-            'TableName' => self::TABLE_NAME
-        ));
+        if (isset(self::$dynamodb)) {
+            self::deleteTable();
+        }
 
         parent::tearDownAfterClass();
     }
+
 
     /**
      * Test with existing DB connection
@@ -102,7 +161,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
     public function testLoad()
     {
         $data = [
-            'db'=>'test'
+            'db' => 'test'
         ];
         
         $options = ['table' => self::TABLE_NAME, 'key' => 'dev'];
@@ -126,3 +185,4 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("", "");
     }
 }
+

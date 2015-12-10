@@ -99,7 +99,7 @@ class Config extends \stdClass
     {
         // Support windows platforms
         if ('winnt' == strtolower(PHP_OS)) {
-            if (count(explode(':', $source))==3) {
+            if (count(explode(':', $source)) === 3) {
                 $exploded = explode(':', $source);
                 $options['loader'] = $exploded[0];
                 unset($exploded[0]);

@@ -82,7 +82,9 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         if (!$wait) return;
         
         self::$dynamodb->waitUntil('TableExists', [
-            'TableName' => self::TABLE_NAME
+            'TableName' => self::TABLE_NAME,
+            'waiter.interval' => 1,
+            'waiter.max_attempts' => 5
         ]);
     }
     
@@ -100,7 +102,9 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         if (!$wait) return;
         
         self::$dynamodb->waitUntil('TableNotExists', [
-            'TableName' => self::TABLE_NAME
+            'TableName' => self::TABLE_NAME,
+            'waiter.interval' => 1,
+            'waiter.max_attempts' => 5
         ]);
     }
     

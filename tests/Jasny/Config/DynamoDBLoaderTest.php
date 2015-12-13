@@ -181,12 +181,23 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
     public function testConfigLoad()
     {
         $options = ['table' => self::TABLE_NAME, 'key' => 'dev'];
+        $config = new Config();
+        $config->load(self::$dynamodb, $options);
+
+        $this->assertEquals('test', $config->db);
+    }
+
+    /**
+     * Test with existing DB connection
+     */
+    public function testConfigLoadNonExistingTable()
+    {
+        $options = ['table' => 'fake', 'key' => 'dev'];
 
         $config = new Config();
+        $config->load(self::$dynamodb, $options);
 
-        $result = $config->load(self::$dynamodb, $options);
-
-        $this->assertEquals("", "");
+        $this->assertNull($config->db);
     }
 }
 

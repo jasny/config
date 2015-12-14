@@ -171,7 +171,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $options = ['table' => self::TABLE_NAME, 'key' => 'dev'];
         $loader = new DynamoDBLoader($options);
         $result = $loader->load(self::$dynamodb);
-        
+
         $this->assertEquals($data, $result);
     }
 
@@ -184,6 +184,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $config = new Config();
         $config->load(self::$dynamodb, $options);
 
+        $this->assertObjectHasAttribute('db', $config);
         $this->assertEquals('test', $config->db);
     }
 
@@ -197,7 +198,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $config = new Config();
         $config->load(self::$dynamodb, $options);
 
-        $this->assertNull($config->db);
+        $this->assertObjectNotHasAttribute('db', $config);
     }
 }
 

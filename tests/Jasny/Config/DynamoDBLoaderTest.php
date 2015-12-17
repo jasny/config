@@ -116,7 +116,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $data = [
             'key' => 'dev',
             'settings' => array(
-                'db' => 'test'
+                'qux' => 'baz'
             )
         ];
 
@@ -164,19 +164,15 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad()
     {
-        $data = [
-            'db' => 'test'
-        ];
-        
         $options = ['table' => self::TABLE_NAME, 'key' => 'dev'];
         $loader = new DynamoDBLoader($options);
         $result = $loader->load(self::$dynamodb);
 
-        $this->assertEquals($data, $result);
+        $this->assertEquals(['qux' => 'baz'], $result);
     }
 
     /**
-     * Test with existing DB connection
+     * Test through config->load
      */
     public function testConfigLoad()
     {
@@ -184,21 +180,60 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $config = new Config();
         $config->load(self::$dynamodb, $options);
 
-        $this->assertObjectHasAttribute('db', $config);
-        $this->assertEquals('test', $config->db);
+        $this->assertObjectHasAttribute('qux', $config);
+        $this->assertEquals('baz', $config->qux);
     }
 
     /**
-     * Test with existing DB connection
+     * Test with non-existing DB table
+     *
+     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedExceptionMessage Failed to load configuration: Requested resource not found
      */
-    public function testConfigLoadNonExistingTable()
+    public function testLoad_NonExistingTable()
     {
-        $options = ['table' => 'fake', 'key' => 'dev'];
+        $options = ['table' => 'nonexisting', 'key' => 'dev'];
+        $loader = new DynamoDBLoader($options);
+        
+        $loader->load(self::$dynamodb);
+    }
 
-        $config = new Config();
-        $config->load(self::$dynamodb, $options);
+    /**
+     * Test with non-existing DB table with 'optional' option
+     */
+    public function testLoad_NonExistingTable_Optional()
+    {
+        $options = ['table' => 'nonexisting', 'key' => 'dev', 'optional' => true];
+        $loader = new DynamoDBLoader($options);
+        
+        $result = $loader->load(self::$dynamodb);
+        $this->assertNull($result);
+    }
 
-        $this->assertObjectNotHasAttribute('db', $config);
+    /**
+     * Test with non-existing DB table
+     *
+     * @expectedException PHPUnit_Framework_Error_Warning
+     * @expectedExceptionMessage Failed to load configuration: No record found for key 'nonexisting'
+     */
+    public function testLoad_NonExistingKey()
+    {
+        $options = ['table' => self::TABLE_NAME, 'key' => 'nonexisting'];
+        $loader = new DynamoDBLoader($options);
+        
+        $result = $loader->load(self::$dynamodb);
+    }
+
+    /**
+     * Test with non-existing DB table
+     */
+    public function testLoad_NonExistingKey_Optional()
+    {
+        $options = ['table' => self::TABLE_NAME, 'key' => 'nonexisting', 'optional' => true];
+        $loader = new DynamoDBLoader($options);
+        
+        $result = $loader->load(self::$dynamodb);
+        $this->assertNull($result);
     }
 }
 

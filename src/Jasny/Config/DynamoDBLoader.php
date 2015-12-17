@@ -20,6 +20,7 @@ use Aws\DynamoDb\Marshaler;
  *   $dynamodb = Aws\DynamoDb\DynamoDbClient::factory([
  *       'region'       => 'eu-west-1'
  *   ]);
+ *
  *   $config = new Jasny\Config();
  *   $config->load($dynamodb, ['table' => 'tableName', 'key' => 'keyValue']);
  * </code>
@@ -29,7 +30,7 @@ class DynamoDBLoader extends Loader
     /**
      * Load config from DynamoDB
      *
-     * @param \Aws\DynamoDb\DynamoDbClient $dynamodb DB connection
+     * @param \Aws\DynamoDb\DynamoDbClient $dynamodb  DB connection
      * @return object
      */
     public function load($dynamodb)
@@ -45,14 +46,13 @@ class DynamoDBLoader extends Loader
     /**
      * Query Dynamo DB
      *
-     * @param type $dynamodb
-     * @param type $table
-     * @param type $key
-     * @return type
+     * @param \Aws\DynamoDb\DynamoDbClient $dynamodb  DB connection
+     * @param string                       $table
+     * @param string                       $key
+     * @return array
      */
     protected function loadData($dynamodb, $table, $key)
     {
-        $data = [];
         $marshaler = new Marshaler();
 
         try {
@@ -62,14 +62,24 @@ class DynamoDBLoader extends Loader
                     'key' => ['S' => $key]
                 ]
             ]);
-
-            if (isset($result['Item'])) {
-                $item = $marshaler->unmarshalItem($result['Item']);
-                $data = $item['settings'];
+            
+            if (!isset($result['Item'])) {
+                $error = "No record found for key '$key'";
             }
-
         } catch (ResourceNotFoundException $e) {
+            $error = $e->getMessage();
         }
+
+        if (isset($error)) {
+            if (empty($this->options['optional'])) {
+                trigger_error("Failed to load configuration: $error", E_USER_WARNING);
+            }
+            
+            return null;
+        }
+        
+        $item = $marshaler->unmarshalItem($result['Item']);
+        $data = $item['settings'];
 
         return $data;
     }

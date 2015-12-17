@@ -9,6 +9,7 @@
 /** */
 namespace Jasny\Config;
 
+use Aws\DynamoDb\Exception\ResourceNotFoundException;
 use Aws\DynamoDb\Marshaler;
 
 /**
@@ -51,21 +52,26 @@ class DynamoDBLoader extends Loader
      */
     protected function loadData($dynamodb, $table, $key)
     {
-        $data = array();
+        $data = [];
         $marshaler = new Marshaler();
 
-        $result = $dynamodb->getItem([
-            'TableName' => $table,
-            'Key' => [
-                'key' => [ 'S' => $key ]
-            ]
-        ]);
+        try {
+            $result = $dynamodb->getItem([
+                'TableName' => $table,
+                'Key' => [
+                    'key' => ['S' => $key]
+                ]
+            ]);
 
-        if(isset($result['Item'])) {
-            $data = $marshaler->unmarshalItem($result['Item']);
+            if (isset($result['Item'])) {
+                $item = $marshaler->unmarshalItem($result['Item']);
+                $data = $item['settings'];
+            }
+
+        } catch (ResourceNotFoundException $e) {
         }
 
-        return $data['settings'];
+        return $data;
     }
 }
 

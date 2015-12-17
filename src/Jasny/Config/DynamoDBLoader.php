@@ -80,7 +80,10 @@ class DynamoDBLoader extends Loader
         }
         
         $item = $marshaler->unmarshalItem($result['Item']);
-        $data = $item['settings'];
+        $data = null;
+        if(isset($item['settings'])) {
+            $data = $item['settings'];
+        }
 
         return Config::objectify($data);
     }

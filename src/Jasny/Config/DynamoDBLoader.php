@@ -9,6 +9,7 @@
 /** */
 namespace Jasny\Config;
 
+use Jasny\Config;
 use Aws\DynamoDb\Exception\ResourceNotFoundException;
 use Aws\DynamoDb\Marshaler;
 
@@ -79,9 +80,12 @@ class DynamoDBLoader extends Loader
         }
         
         $item = $marshaler->unmarshalItem($result['Item']);
-        $data = $item['settings'];
+        $data = null;
+        if(isset($item['settings'])) {
+            $data = $item['settings'];
+        }
 
-        return $data;
+        return Config::objectify($data);
     }
 }
 

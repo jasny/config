@@ -107,6 +107,22 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             'waiter.max_attempts' => 5
         ]);
     }
+
+    /**
+     * Get test config data
+     *
+     * @return object
+     */
+    protected static function getTestData()
+    {
+        $data = new \StdClass;
+        $data->qux = 'baz';
+        $data->foo = new \StdClass;
+        $data->foo->bar = 'qux';
+        $data->foo->qux = 'baz';
+
+        return $data;
+    }
     
     /**
      * Fill the table with data
@@ -115,9 +131,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
     {
         $data = [
             'key' => 'dev',
-            'settings' => array(
-                'qux' => 'baz'
-            )
+            'settings' => self::getTestData()
         ];
 
         $marshaler = new Marshaler();
@@ -168,7 +182,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $loader = new DynamoDBLoader($options);
         $result = $loader->load(self::$dynamodb);
 
-        $this->assertEquals(['qux' => 'baz'], $result);
+        $this->assertEquals(self::getTestData(), $result);
     }
 
     /**
@@ -180,8 +194,10 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $config = new Config();
         $config->load(self::$dynamodb, $options);
 
-        $this->assertObjectHasAttribute('qux', $config);
-        $this->assertEquals('baz', $config->qux);
+        $expected = self::getTestData();
+
+        $this->assertEquals($expected->qux, $config->qux);
+        $this->assertEquals($expected->foo, $config->foo);
     }
 
     /**

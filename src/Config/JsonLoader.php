@@ -9,31 +9,53 @@
 /** */
 namespace Jasny\Config;
 
+use Jasny\Config;
+use Jasny\Config\LoaderInterface;
+use Jasny\ConfigException;
+
 /**
  * Load and parse .json config files from a directory.
  *
  * @package Config
  */
-class JsonLoader extends Loader
+class JsonLoader implements LoaderInterface
 {
     use LoadFile;
     
     /**
-     * Parse json string
-     *
-     * @param string $input  JSON string
-     * @return object
+     * Assert that data have been property loaded
+     * 
+     * @param \stdClass|null|mixed $data
+     * @param string $file
+     * @throws ConfigException
      */
-    public function parse($input)
+    protected function assertData($data, $file)
     {
-        $data = json_decode($input);
-        
-        if (json_last_error()) {
-            $msg = "Failed to parse json file: " . $this->getJsonError(json_last_error());
-            trigger_error($msg, E_USER_WARNING);
+        if ($data === null && json_last_error()) {
+            $error = $this->getJsonError(json_last_error());
+            throw new ConfigException("Failed to parse json from '$file': $error");
         }
         
-        return $data;
+        if (!$data instanceof \stdClass) {
+            throw new ConfigException("Failed to parse json from '$file': data should be an object");
+        }
+    }
+    
+    /**
+     * Parse json string
+     *
+     * @param string $file
+     * @param array  $options
+     * @return object
+     */
+    public function loadFile($file, array $options)
+    {
+        $json = file_get_contents($file);
+        
+        $data = json_decode($json);
+        $this->assertData($data, $file);
+        
+        return new Config($data);
     }
     
     /**
@@ -44,8 +66,10 @@ class JsonLoader extends Loader
      */
     protected function getJsonError($errno)
     {
-        if (!is_int($errno)) $errno = 9999;
-    
+        if (!is_int($errno)) {
+            $errno = 9999;
+        }
+        
         switch ($errno) {
             case JSON_ERROR_NONE:
                 return 'No error';

@@ -1,12 +1,5 @@
 <?php
-/**
- * Jasny Config - Configure your application.
- * 
- * @author  Arnold Daniels <arnold@jasny.net>
- * @license https://raw.github.com/jasny/config/master/LICENSE MIT
- * @link    https://jasny.github.io/config
- */
-/** */
+
 namespace Jasny\Config;
 
 /**
@@ -30,22 +23,29 @@ class MySQLLoaderTest extends \PHPUnit_Framework_TestCase
         // Setup DB
         mysqli_report(MYSQLI_REPORT_STRICT);
         try {
-            self::$db = new \mysqli(ini_get('mysqli.default_host'), ini_get('mysqli.default_user') ?: 'root', ini_get('mysqli.default_pw'));
+            self::$db = new \mysqli(
+                ini_get('mysqli.default_host'),
+                ini_get('mysqli.default_user') ?: 'root',
+                ini_get('mysqli.default_pw')
+            );
         } catch (\mysqli_sql_exception $e) {
             throw new \PHPUnit_Framework_SkippedTestError("Failed to connect to mysql: " . $e->getMessage());
         }
 
-        $queries = array(
+        $queries = [
             "CREATE DATABASE `jasny_config_test`",
             "USE `jasny_config_test`",
-            "CREATE TABLE `settings` (`option` VARCHAR(32) NOT NULL, `value` VARCHAR(255) NOT NULL, `group` VARCHAR(32) DEFAULT NULL)",
-            "INSERT INTO `settings` VALUES ('opt1', 'test', NULL), ('opt2', 'jasny', NULL), ('q', 'mysqli', 'grp1'), ('b', 27, 'grp1'), ('a', 'foobar', 'grp2')");
+            "CREATE TABLE `settings` (`option` VARCHAR(32) NOT NULL, `value` VARCHAR(255) NOT NULL,"
+                . " `group` VARCHAR(32) DEFAULT NULL)",
+            "INSERT INTO `settings` VALUES ('opt1', 'test', NULL), ('opt2', 'jasny', NULL), ('q', 'mysqli', 'grp1'),"
+                . " ('b', 27, 'grp1'), ('a', 'foobar', 'grp2')"
+        ];
         
         foreach ($queries as $query) {
             try {
                 self::$db->query($query);
             } catch (\mysqli_sql_exception $e) {
-                throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise DBs: " . $e->getMessage());
+                throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise DB: " . $e->getMessage());
             }
         }
     }

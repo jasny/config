@@ -1,12 +1,5 @@
 <?php
-/**
- * Jasny Config - Configure your application.
- * 
- * @author  Arnold Daniels <arnold@jasny.net>
- * @license https://raw.github.com/jasny/config/master/LICENSE MIT
- * @link    https://jasny.github.io/config
- */
-/** */
+
 namespace Jasny\Config;
 
 use Aws\DynamoDb\DynamoDbClient;
@@ -156,7 +149,8 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             self::createTable(true);
             self::fillTable();
         } catch (CurlException $e) {
-            throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise local dynamodb. Is dynalite running on localhost:4567?");
+            throw new \PHPUnit_Framework_SkippedTestError("Failed to initialise local dynamodb. Is dynalite running on"
+                . " localhost:4567?");
         }
     }
     
@@ -178,9 +172,9 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoad()
     {
-        $options = ['table' => self::TABLE_NAME, 'key' => 'dev'];
-        $loader = new DynamoDBLoader($options);
-        $result = $loader->load(self::$dynamodb);
+        $options = ['table' => self::TABLE_NAME, 'key' => 'dev', 'property' => 'settings'];
+        $loader = new DynamoDBLoader();
+        $result = $loader->load(self::$dynamodb, $options);
 
         $this->assertEquals(self::getTestData(), $result);
     }
@@ -252,4 +246,3 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($result);
     }
 }
-

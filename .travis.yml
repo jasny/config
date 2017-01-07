@@ -1,15 +1,10 @@
 language: php
 
 php:
-  - 5.4
-  - 5.5
   - 5.6
   - 7.0
+  - 7.1
   
-matrix:
-  allow_failures:
-    - php: 7.0
-
 services:
   - mysql
 
@@ -17,7 +12,7 @@ install:
   - composer install
   - wget https://scrutinizer-ci.com/ocular.phar -O "$HOME/ocular.phar"
   - nvm use 0.10 && node --version && npm install -g dynalite
-  - sudo pip install virtualenv && (cd tests/dynalite && make supervisord && ./venv/bin/supervisorctl start dynalite)
+  - pip install virtualenv && (cd .travis/dynalite && make supervisord && ./venv/bin/supervisorctl start dynalite)
   
 script:
   - vendor/bin/phpunit --coverage-clover cache/logs/clover.xml

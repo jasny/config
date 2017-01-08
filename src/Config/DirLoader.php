@@ -22,9 +22,14 @@ class DirLoader implements LoaderInterface
      * @return boolean
      * @throws ConfigException
      */
-    protected function assertDir($dir, array $options = [])
+    protected function assertDir($dir, array $options)
     {
-        if (is_dir($dir)) {
+        if (!is_string($dir) && !(is_object($dir) && method_exists($dir, '__toString'))) {
+            $type = (is_object($dir) ? get_class($dir) . ' ' : '') . gettype($dir);
+            throw new \InvalidArgumentException("Expected a string as directory, got a $type");
+        }
+        
+        if (is_dir((string)$dir)) {
             return true;
         }
         
@@ -51,10 +56,7 @@ class DirLoader implements LoaderInterface
         
         $loader = $this->getDelegateLoader($options);
         
-        $options['delegate_loader'] = $loader;
-        $options['optional'] = true;
-        
-        return $loader->load($file, $options);
+        return $loader->load($file, ['delegate_loader' => $loader] + $options);
     }
     
     /**
@@ -79,9 +81,11 @@ class DirLoader implements LoaderInterface
      */
     public function load($dir, array $options = [])
     {
-        if (!$this->assertDir($options)) {
+        if (!$this->assertDir($dir, $options)) {
             return null;
         }
+        
+        $dir = rtrim((string)$dir, DIRECTORY_SEPARATOR);
         
         $config = new Config();
         
@@ -90,7 +94,7 @@ class DirLoader implements LoaderInterface
                 continue;
             }
             
-            $data = $this->loadFile($file, $options);
+            $data = $this->loadFile($dir . DIRECTORY_SEPARATOR . $file, $options);
             
             if (isset($data)) {
                 $this->addDataToConfig($config, $file, $data);

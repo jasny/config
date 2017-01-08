@@ -13,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
  * options:
  *   flags - A set of PARSE_* constants to customize the YAML parser behavior
  */
-class YamlSpycLoader implements LoaderInterface
+class YamlSymfonyLoader implements LoaderInterface
 {
     use LoadFile;
     

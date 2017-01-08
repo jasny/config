@@ -20,7 +20,8 @@ class Config extends \stdClass
         if (isset($settings)) {
             if (!$settings instanceof \stdClass && !is_array($settings)) {
                 $type = (is_object($settings) ? get_class($settings) . ' ' : '') . gettype($settings);
-                throw new \InvalidArgumentException("Settings should be an array or stdClass object, not a $type");
+                throw new \InvalidArgumentException("Settings should be an array or stdClass object, not a $type."
+                    . " Use the `load` method to load settings from a source.");
             }
             
             self::merge($this, static::objectify((object)$settings));
@@ -73,7 +74,23 @@ class Config extends \stdClass
         
         return $this;
     }
+
     
+    /**
+     * Assert each argument is a stdClass
+     * 
+     * @param \stdClass[] $args
+     * @throws \InvalidArgumentException
+     */
+    protected static function assertMergeArguments(array $args)
+    {
+        foreach ($args as $i => $arg) {
+            if (isset($arg) && !$arg instanceof \stdClass) {
+                $type = (is_object($arg) ? get_class($arg) . ' ' : '') . gettype($arg);
+                throw new \InvalidArgumentException("Argument " . ($i + 1) . " is not a stdClass object, but a $type");
+            }
+        }
+    }
     
     /**
      * Recursive merge of 2 or more objects
@@ -83,16 +100,15 @@ class Config extends \stdClass
      * @param \stdClass ...
      * @return \stdClass $target
      */
-    public static function merge(\stdClass &$target, ...$sources)
+    public static function merge(&$target, ...$sources)
     {
-        foreach ($sources as $i => $source) {
-            if (!$source instanceof \stdClass) {
-                $type = (is_object($source) ? get_class($source) . ' ' : '') . gettype($source);
-                throw new \InvalidArgumentException("Argument " . ($i + 1) . " is not a stdClass object, but a $type");
-            }
-        }
+        static::assertMergeArguments(func_get_args());
         
         foreach ($sources as $source) {
+            if (!isset($source)) {
+                continue;
+            }
+            
             if (!isset($target)) {
                 $target = $source;
                 continue;

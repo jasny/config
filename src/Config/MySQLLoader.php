@@ -24,8 +24,13 @@ class MySQLLoader implements LoaderInterface
      * @param array  $options
      * @return object
      */
-    public function load(\mysqli $connection, $options)
+    public function load($connection, array $options = [])
     {
+        if (!$connection instanceof \mysqli) {
+            $type = (is_object($connection) ? get_class($connection) . ' ' : '') . gettype($connection);
+            throw new \InvalidArgumentException("Expected a mysqli object not a $type");
+        }
+        
         if (!isset($options['query'])) {
             throw new ConfigException("Option 'query' is required to load configuration from MySQL");
         }

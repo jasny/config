@@ -14,24 +14,6 @@ class NeonLoader implements LoaderInterface
     use LoadFile;
     
     /**
-     * Assert that data have been property loaded
-     * 
-     * @param \stdClass|null|mixed $data
-     * @param string $file
-     * @throws ConfigException
-     */
-    protected function assertData($data, $file)
-    {
-        if (empty($data)) {
-            throw new ConfigException("Failed to parse neon from '$file'");
-        }
-        
-        if (!$data instanceof \stdClass && !is_array($data)) {
-            throw new ConfigException("Failed to parse neon from '$file': data should be key/value pairs");
-        }
-    }
-    
-    /**
      * Load the configuration from a file
      *
      * @param string $file
@@ -40,6 +22,10 @@ class NeonLoader implements LoaderInterface
      */
     protected function loadFile($file, array $options)
     {
+        if (!class_exists('Nette\Neon')) {
+            throw new ConfigException("To load config from neon file you need the Nette Neon library");
+        }
+        
         $neon = file_get_contents($file);
         
         $decoder = new Neon\Decoder();

@@ -48,6 +48,24 @@ trait LoadFile
 
     
     /**
+     * Assert that data has been property loaded
+     * 
+     * @param \stdClass|array|mixed $data
+     * @param string $file
+     * @throws ConfigException
+     */
+    protected function assertData($data, $file)
+    {
+        if ($data === false || $data === null) {
+            throw new ConfigException("Failed to load settings from '$file' using " . get_class($this));
+        }
+        
+        if (!$data instanceof \stdClass && (!is_array($data) || array_keys($data) === array_keys(array_keys($data)))) {
+            throw new ConfigException("Failed to load settings from '$file': data should be key/value pairs");
+        }
+    }
+    
+    /**
      * Assert the file exists
      * 
      * @param string $file
@@ -67,6 +85,7 @@ trait LoadFile
         
         return true;
     }
+    
     
     /**
      * Load a config file or directory

@@ -21,19 +21,6 @@ class IniLoader implements LoaderInterface
     use LoadFile;
     
     /**
-     * Assert that data have been property loaded
-     * 
-     * @param array|false $data
-     * @throws ConfigException
-     */
-    protected function assertData($data, $file)
-    {
-        if ($data === false) {
-            throw new ConfigException("Failed to load settings from '$file' using " . get_class($this));
-        }
-    }
-    
-    /**
      * Parse ini file
      *
      * @param string $file    Filename

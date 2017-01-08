@@ -105,23 +105,3 @@ class DirLoaderTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($result);
     }
 }
-
-/**
- * File loader stub
- * @ignore
- */
-class DirTestLoader extends Loader
-{
-    static public $data;
-    
-    public function load($file)
-    {
-        $key = preg_replace('/^' . preg_quote(CONFIGTEST_SUPPORT_PATH . '/test/', '/') . '|\.test$/', '', $file);
-        return self::$data[$key];
-    }
-    
-    public static function reset()
-    {
-        self::$data = null;
-    }
-}

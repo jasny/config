@@ -13,20 +13,26 @@ use Jasny\Config;
 use Jasny\Config\LoaderInterface;
 use Jasny\ConfigException;
 use Aws\DynamoDb\DynamoDbClient;
-use Aws\DynamoDb\Exception\ResourceNotFoundException;
+use Aws\DynamoDb\Exception\DynamoDbException;
 use Aws\DynamoDb\Marshaler;
 
 /**
  * Load config from Dynamo DB.
  *
  * <code>
- *   $db = new mysqli($host, $user, $pwd, $dbname);
  *   $dynamodb = Aws\DynamoDb\DynamoDbClient::factory([
- *       'region' => 'eu-west-1'
+ *       'region' => 'eu-west-1',
+ *       'version' => '2012-08-10'
  *   ]);
  *
  *   $config = new Jasny\Config();
- *   $config->load($dynamodb, ['table' => 'tableName', 'key' => 'keyValue', 'property' => 'settings']);
+ * 
+ *   $config->load($dynamodb, [
+ *      'table' => 'config',
+ *      'field' => 'key',
+ *      'key' => 'staging',
+ *      'map' => 'settings'
+ *   ]);
  * </code>
  */
 class DynamoDBLoader implements LoaderInterface
@@ -39,74 +45,96 @@ class DynamoDBLoader implements LoaderInterface
      */
     protected function assertOptions(array $options)
     {
-        if (!isset($options["table"])) {
-            throw new ConfigException("Option 'table' is required to load configuration from DynamoDB");
+        if (!isset($options['table'])) {
+            throw new \BadMethodCallException("Option 'table' is required to load configuration from DynamoDB");
         }
         
-        if (!isset($options["table"])) {
-            throw new ConfigException("Option 'key' is required to load configuration from DynamoDB");
+        if (!isset($options['key'])) {
+            throw new \BadMethodCallException("Option 'key' is required to load configuration from DynamoDB");
         }
     }
 
+    
     /**
-     * Query Dynamo DB
-     *
-     * @param DynamoDbClient $dynamodb  DB connection
-     * @param string         $table
-     * @param string         $key
+     * Get the map with settings from the data.
+     * 
+     * @param array $data
+     * @param array $options
      * @return array
      */
-    protected function loadData($dynamodb, $table, $key)
+    protected function mapData(array $data, array $options)
     {
-        $marshaler = new Marshaler();
+        if (empty($options['map'])) {
+            return $data;
+        }
+        
+        $field = $options['map'];
 
+        if (!isset($data[$field]) && empty($options['optional'])) {
+            throw new ConfigException("DynamoDB item '{$options['key']}' doesn't have a '$field' field");
+        }
+
+        return isset($data[$field]) ? $data[$field] : null;
+    }
+    
+    /**
+     * Query Dynamo DB table loading all settings from a single item.
+     *
+     * @param DynamoDbClient $dynamodb  DB connection
+     * @param array          $options
+     * @return array
+     */
+    protected function loadDataFromItem(DynamoDbClient $dynamodb, array $options)
+    {
+        $field = isset($options["field"]) ? $options["field"] : 'key';
+        $key = $options["key"];
+        
         try {
             $result = $dynamodb->getItem([
-                'TableName' => $table,
+                'TableName' => $options["table"],
                 'Key' => [
-                    'key' => ['S' => $key]
+                    $field => ['S' => $key]
                 ]
             ]);
             
-            if (!isset($result['Item'])) {
-                $error = "No record found for key '$key'";
-            }
-        } catch (ResourceNotFoundException $e) {
-            $error = $e->getMessage();
-        }
-
-        if (isset($error)) {
-            if (empty($this->options['optional'])) {
-                throw new ConfigException("Failed to load configuration from DynamoDB: $error");
+            if (!isset($result['Item']) && empty($options['optional'])) {
+                throw new ConfigException("Failed to load '{$options['key']}' configuration from DynamoDB: "
+                    . "No item found with $field '$key'");
             }
             
+            $item = isset($result['Item']) ? $result['Item'] : null;
+        } catch (DynamoDbException $e) {
+            if (empty($options['optional'])) {
+                throw new ConfigException("Failed to load '{$options['key']}' configuration from DynamoDB", 0, $e);
+            }
+        }
+
+        if (!isset($item)) {
             return null;
         }
         
-        return $marshaler->unmarshalItem($result['Item']);
+        $marshaler = new Marshaler();
+        $data = $marshaler->unmarshalItem($item);
+        
+        return isset($data) ? $this->mapData($data, $options) : null;
     }
+    
     
     /**
      * Create Config object from data
      * 
-     * @param array $data
-     * @param array $options
+     * @param array|null $data
+     * @param array      $options
      * @return Config
      */
-    protected function createConfig(array $data, array $options)
+    protected function createConfig($data, array $options)
     {
-        if ($options['property']) {
-            $property = $options['property'];
-            
-            if (!isset($data[$property])) {
-                if (empty($options['optional'])) {
-                    throw new ConfigException("DynamoDB item '{$options['key']}' doesn't have a '$property' property");
-                }
-                
-                return null;
-            }
-            
-            $data = $data[$property];
+        if (!isset($data)) {
+            return null;
+        }
+        
+        if (!is_array($data)) {
+            throw new ConfigException("DynamoDB '{$options['key']}' configuration isn't a key/value map");
         }
         
         return new Config($data);
@@ -121,16 +149,15 @@ class DynamoDBLoader implements LoaderInterface
      */
     public function load($dynamodb, array $options = [])
     {
-        if (!$dynamodb instanceof \Aws\DynamoDb\DynamoDbClient) {
+        if (!$dynamodb instanceof DynamoDbClient) {
             $type = (is_object($dynamodb) ? get_class($dynamodb) . ' ' : '') . gettype($dynamodb);
             throw new \InvalidArgumentException("Connection isn't a DynamoDbClient object but a $type");
         }
         
         $this->assertOptions($options);
 
-        $data = $this->loadData($dynamodb, $options["table"], $options["key"]);
+        $data = $this->loadDataFromItem($dynamodb, $options);
         
-        return isset($data) ? $this->createConfig($data, $options) : null;
+        return $this->createConfig($data, $options);
     }
 }
-

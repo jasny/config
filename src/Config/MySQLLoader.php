@@ -33,7 +33,7 @@ class MySQLLoader implements LoaderInterface
         }
         
         if (!isset($options['query'])) {
-            throw new ConfigException("Option 'query' is required to load configuration from MySQL");
+            throw new \BadMethodCallException("Option 'query' is required to load configuration from MySQL");
         }
         
         $data = $this->loadData($connection, $options['query']);

@@ -4,7 +4,6 @@ namespace Jasny\Config;
 
 use Jasny\Config;
 use Jasny\Config\MySQLLoader;
-use Jasny\ConfigException;
 
 /**
  * Test for Jasny\Config\MySQLLoader
@@ -94,7 +93,7 @@ class MySQLLoaderTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException Jasny\ConfigException
+     * @expectedException BadMethodCallException
      * @expectedExceptionMessage Option 'query' is required to load configuration from MySQL
      */
     public function testLoadWithoutQuery()

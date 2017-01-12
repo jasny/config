@@ -23,6 +23,7 @@ class MySQLLoader implements LoaderInterface
      * @param mysqli $connection  DB connection
      * @param array  $options
      * @return object
+     * @throws ConfigException if 'query' option isn't set
      */
     public function load($connection, array $options = [])
     {
@@ -53,9 +54,9 @@ class MySQLLoader implements LoaderInterface
             $result = $connection->query($query);
             
             if (!$result) {
-                throw new \Exception($connection->error);
+                throw new \mysqli_sql_exception($connection->error);
             }
-        } catch (\Exception $e) {
+        } catch (\mysqli_sql_exception $e) {
             throw new ConfigException("Failed to load configuration from MySQL: query failed", 0, $e);
         }
         

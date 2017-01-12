@@ -18,6 +18,7 @@
         "php": ">=5.6.0"
     },
     "require-dev": {
+        "ext-mysqli": "*",
         "jasny/php-code-quality": "^2.0",
         "mustangostang/spyc": "^0.6",
       	"symfony/yaml": "^3.0",

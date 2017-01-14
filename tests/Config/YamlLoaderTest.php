@@ -1,105 +1,125 @@
 <?php
-/**
- * Jasny Config - Configure your application.
- * 
- * @author  Arnold Daniels <arnold@jasny.net>
- * @license https://raw.github.com/jasny/config/master/LICENSE MIT
- * @link    https://jasny.github.io/config
- */
-/** */
+
 namespace Jasny\Config;
 
+use Jasny\Config;
+Use Jasny\Config\LoaderInterface;
+use Jasny\Config\YamlLoader;
+use org\bovigo\vfs\vfsStream;
+
 /**
- * Tests for Jasny\Config\YamlLoader.
- * 
- * @package Test
+ * @covers Jasny\Config\YamlLoader
  */
 class YamlLoaderTest extends \PHPUnit_Framework_TestCase
 {
-    protected static $yaml = <<<YAML
-grp1:
-   q : yaml
-   b : 27
-grp2:
-   a : foobar
-grp3:
-   - one
-   - two
-   - three
-YAML;
-    
     /**
      * @var YamlLoader
      */
     protected $loader;
     
     /**
-     * This method is called before a test is executed.
+     * @var vfsStreamDirectory
      */
-    protected function setUp()
+    protected $root;
+    
+    
+    public function setUp()
     {
         $this->loader = new YamlLoader();
+        $this->root = vfsStream::setup();
     }
-
-    /**
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-        $this->loader = null;
-    }
-
     
-    /**
-     * Get test config data
-     * 
-     * @return object
-     */
-    protected function getTestData()
+    
+    public function testGetLoader()
     {
-        return (object)[
-            'grp1'=>(object)['q'=>'yaml', 'b'=>27],
-            'grp2'=>(object)['a'=>'foobar'],
-            'grp3'=>['one', 'two', 'three']
+        $use = $this->createMock(LoaderInterface::class);
+        
+        $loader = $this->loader->getLoader(compact('use'));
+        
+        $this->assertSame($use, $loader);
+    }
+    
+    public function loaderProvider()
+    {
+        return [
+            ['yaml', YamlYamlLoader::class],
+            ['symfony', YamlSymfonyLoader::class],
+            ['spyc', YamlSpycLoader::class]
         ];
     }
     
-    
     /**
-     * Test parsing a string
+     * @dataProvider loaderProvider
+     * 
+     * @param string $use
+     * @param string $class
      */
-    public function testParse()
+    public function testGetLoaderUse($use, $class)
     {
-        $result = $this->loader->parse(self::$yaml);
-        $this->assertEquals($this->getTestData(), $result);
+        $loader = $this->loader->getLoader(compact('use'));
+        
+        $this->assertInstanceof($class, $loader);
     }
     
     /**
-     * Test parsing a string using Symfony
+     * @dataProvider loaderProvider
+     * 
+     * @param string $use
+     * @param string $class
      */
-    public function testParse_Symfony()
+    public function testGetLoaderGuess($use, $class)
     {
-        $this->loader = new YamlLoader(['use'=>'symfony']);
-        $result = $this->loader->parse(self::$yaml);
-        $this->assertEquals($this->getTestData(), $result);
+        $this->loader = $this->createPartialMock(YamlLoader::class, ['guessLoader']);
+        $this->loader->method('guessLoader')->willReturn($use);
+        
+        $loader = $this->loader->getLoader([]);
+        
+        $this->assertInstanceof($class, $loader);
+    }
+    
+    
+    /**
+     * @expectedException BadMethodCallException
+     * @expectedExceptionMessage YamlNonExistingLoader does not exist
+     */
+    public function testGetLoaderWithNonExisting()
+    {
+        $this->loader->getLoader(['use' => 'non_existing']);
     }
     
     /**
-     * Test parsing a string using Spyc
+     * @expectedException BadMethodCallException
+     * @expectedExceptionMessage stdClass doesn't implement LoaderInterface
      */
-    public function testParse_Spyc()
+    public function testGetLoaderWithInvalidClass()
     {
-        $this->loader = new YamlLoader(['use'=>'spyc']);
-        $result = $this->loader->parse(self::$yaml);
-        $this->assertEquals($this->getTestData(), $result);
+        $this->loader->getLoader(['use' => new \stdClass()]);
     }
     
     /**
-     * Test loading a file
+     * @expectedException BadMethodCallException
+     * @expectedExceptionMessage array doesn't implement LoaderInterface
      */
-    public function testLoadFile()
+    public function testGetLoaderWithInvalidUse()
     {
-        $result = $this->loader->load(CONFIGTEST_SUPPORT_PATH . '/test.yaml');
-        $this->assertEquals($this->getTestData(), $result);
+        $this->loader->getLoader(['use' => []]);
+    }
+    
+    
+    public function testLoad()
+    {
+        $use = $this->createMock(LoaderInterface::class);
+        $config = $this->createMock(Config::class);
+        $options = ['use' => $use, 'foo' => 'bar'];
+        
+        vfsStream::create(['test.yml' => '']);
+        $filename = vfsStream::url('root/test.yml');
+        
+        $use->expects($this->once())->method('load')->with($filename, $this->identicalTo($options))
+            ->willReturn($config);
+        
+        $ret = $this->loader->load($filename, $options);
+        
+        $this->assertSame($config, $ret);
     }
 }

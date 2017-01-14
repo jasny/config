@@ -20,6 +20,8 @@ class YamlLoader implements LoaderInterface
     /**
      * Guess which parser to use based on what's available.
      * @codeCoverageIgnore
+     * 
+     * @return string
      */
     public function guessLoader()
     {
@@ -40,27 +42,41 @@ class YamlLoader implements LoaderInterface
     }
     
     /**
+     * Get loader class by name
+     * 
+     * @param string $use
+     * @return string
+     */
+    protected function getLoaderClass($use)
+    {
+        $name = str_replace(' ', '', ucwords(preg_replace('/[\W_]+/', ' ', $use))); // StudlyCase
+        
+        return __NAMESPACE__ . '\Yaml' . $name . 'Loader';
+    }
+    
+    /**
      * Get the parser
      *
      * @param array $options
+     * @return LoaderInterface
      */
     public function getLoader(array $options)
     {
-        $loader = !empty($options['use']) ? $options['use'] : $this->guessLoader();
+        $loader = isset($options['use']) ? $options['use'] : $this->guessLoader();
         
         if (is_string($loader)) {
-            $class = __NAMESPACE__ . '//Yaml' . ucfirst($use) . 'Loader';
+            $class = $this->getLoaderClass($loader);
 
             if (!class_exists($class)) {
-                throw new ConfigException("Unable to parse yaml configuration file: $class does not exist");
+                throw new \BadMethodCallException("$class does not exist");
             }
             
             $loader = new $class();
         }
         
         if (!$loader instanceof LoaderInterface) {
-            $type = (is_object($loader) ? get_class($loader) . ' ' : '') . gettype($loader);
-            throw new \UnexpectedValueException("$type doesn't implement LoaderInterface");
+            $type = (is_object($loader) ? get_class($loader) : gettype($loader));
+            throw new \BadMethodCallException("$type doesn't implement LoaderInterface");
         }
         
         return $loader;
@@ -74,7 +90,7 @@ class YamlLoader implements LoaderInterface
      * @param array  $options
      * @return Config
      */
-    public function loadFile($file, array $options)
+    protected function loadFile($file, array $options)
     {
         $loader = $this->getLoader($options);
         

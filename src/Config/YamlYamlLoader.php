@@ -1,6 +1,6 @@
 <?php
 
-namespace Jasny\Config\Yaml;
+namespace Jasny\Config;
 
 use Jasny\Config;
 use Jasny\Config\LoaderInterface;

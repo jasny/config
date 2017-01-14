@@ -65,6 +65,10 @@ class DynamoDBLoader implements LoaderInterface
     protected function mapData(array $data, array $options)
     {
         if (empty($options['map'])) {
+            if (!isset($options['field'])) {
+                unset($data['key']);
+            }
+            
             return $data;
         }
         

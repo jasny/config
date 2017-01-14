@@ -76,7 +76,34 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
         $config = $loader->load($this->dynamodb, ['table' => 'config', 'key' => 'dev']);
 
         $this->assertEquals(new Config([
-            'key' => 'dev',
+            'foo' => 'bar',
+            'zoo' => true
+        ]), $config);
+    }
+    
+    public function testLoadWithFieldAndKey()
+    {
+        $this->dynamodb->expects($this->once())->method('getItem')
+            ->with([
+                'TableName' => 'config',
+                'Key' => [
+                    'env' => ['S' => 'dev']
+                ]
+            ])
+            ->willReturn([
+                'Item' => [
+                    'env' => ['S' => 'dev'],
+                    'foo' => ['S' => 'bar'],
+                    'zoo' => ['BOOL' => true]
+                ]
+            ]);
+        
+        $loader = new DynamoDBLoader();
+        
+        $config = $loader->load($this->dynamodb, ['table' => 'config', 'field' => 'env', 'key' => 'dev']);
+
+        $this->assertEquals(new Config([
+            'env' => 'dev',
             'foo' => 'bar',
             'zoo' => true
         ]), $config);

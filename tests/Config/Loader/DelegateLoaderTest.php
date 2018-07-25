@@ -52,6 +52,22 @@ class DelegateLoaderTest extends TestCase
         $this->assertSame($config, $result);
     }
 
+    public function testLoadSource()
+    {
+        $config = $this->createMock(Config::class);
+        $options = ['a' => 'b'];
+
+        $this->loaders['foo']->expects($this->never())->method('load');
+        $this->loaders['stdClass']->expects($this->never())->method('load');
+
+        $this->loaders['bar']->expects($this->once())->method('load')->with('bar', $options)
+            ->willReturn($config);
+
+        $result = $this->loader->load('bar', $options);
+
+        $this->assertSame($config, $result);
+    }
+
     public function testLoadObject()
     {
         $input = new stdClass();
@@ -118,7 +134,9 @@ class DelegateLoaderTest extends TestCase
         $this->assertArrayHasKey('yaml', $loaders);
         $this->assertInstanceOf(Loader\YamlLoader::class, $loaders['yaml']);
         $this->assertArrayHasKey('yml', $loaders);
-        $this->assertInstanceOf(Loader\YamlLoader::class, $loaders['yaml']);
+        $this->assertInstanceOf(Loader\YamlLoader::class, $loaders['yml']);
+        $this->assertArrayHasKey('env', $loaders);
+        $this->assertInstanceOf(Loader\EnvLoader::class, $loaders['env']);
         $this->assertArrayHasKey('Aws\DynamoDb\DynamoDbClient', $loaders);
         $this->assertInstanceOf(Loader\DynamoDBLoader::class, $loaders['Aws\DynamoDb\DynamoDbClient']);
 

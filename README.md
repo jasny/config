@@ -33,6 +33,7 @@ $config = (new Config())
 * Yaml
   * Symfony
   * Yaml extension
+* Env
 * DynamoDB
 
 The `DelegateLoader` can pick a loader based on class name or file extension.
@@ -104,6 +105,27 @@ $parser = new class() extends Yaml\Parser() {
 
 $yamlLoader = new YamlSymfonyLoader($options, $parser);
 ```
+
+### Env
+
+`EnvLoader` maps environment variables to settings. In the mapping the settings key supports dot notation.
+
+| option           | type   | default            |                                                  |
+| ---------------- | ------ | ------------------ | ------------------------------------------------ |
+| map              | array  | (required)         | key/value pairs from env name to setting key     |
+
+**Example**
+
+```php
+$map = [
+    "APP_SECRET" => "secret",
+    "APP_DATABASE_PASSWORD" => "db.password"
+];
+
+$config->load('env', ['map' => $map]);
+
+```
+
 
 ### DynamoDB
 

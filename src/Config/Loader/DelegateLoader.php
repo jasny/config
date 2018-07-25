@@ -72,7 +72,7 @@ class DelegateLoader implements LoaderInterface
     }
 
     /**
-     * Determine loader based on file path
+     * Determine loader based on file extension
      * 
      * @param string $source
      * @return LoaderInterface
@@ -80,6 +80,10 @@ class DelegateLoader implements LoaderInterface
      */
     protected function determineLoaderFromPath(string $source): LoaderInterface
     {
+        if (isset($this->loaders[$source])) {
+            return $this->loaders[$source];
+        }
+
         $key = is_dir($source) ? 'dir' : (pathinfo($source, PATHINFO_EXTENSION) ?: null);
 
         if (!isset($key) || !isset($this->loaders[$key])) {
@@ -117,6 +121,7 @@ class DelegateLoader implements LoaderInterface
             'ini' => new Loader\IniLoader(),
             'json' => new Loader\JsonLoader(),
             'yaml' => function_exists('yaml_parse') ? new Loader\YamlLoader() : new Loader\YamlSymfonyLoader(),
+            'env' => new Loader\EnvLoader(),
             'Aws\DynamoDb\DynamoDbClient' => new Loader\DynamoDBLoader()
         ];
 

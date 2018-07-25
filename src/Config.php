@@ -183,7 +183,7 @@ class Config extends stdClass implements ContainerInterface
             (function_exists('opcache_is_script_cached') && opcache_is_script_cached($filename)) ||
             file_exists($filename)
         ) {
-            return include $filename;
+            return include $filename ?: null;
         }
 
         return null;

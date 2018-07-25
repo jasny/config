@@ -2,59 +2,58 @@
 
 namespace Jasny;
 
-use Jasny\Config\Loader;
+use Jasny\Config\Exception\NotFoundException;
 use Jasny\Config\LoaderInterface;
+use Jasny\Config\Loader\DelegateLoader;
+use Psr\Container\ContainerInterface;
+use Jasny\DotKey;
+use stdClass;
+
+use function Jasny\expect_type;
+use function Jasny\objectify;
+use function Jasny\str_starts_with;
+use function Jasny\str_contains;
 
 /**
  * Configuration settings.
  */
-class Config extends \stdClass
+class Config extends stdClass implements ContainerInterface
 {
+    /**
+     * @var LoaderInterface
+     */
+    protected $i__loader;
+
     /**
      * Class constructor
      * 
-     * @param array|\stdClass $settings
+     * @param array|stdClass  $settings
+     * @param LoaderInterface $loader
      */
-    public function __construct($settings = null)
+    public function __construct($settings = [], LoaderInterface $loader = null)
     {
-        if (isset($settings)) {
-            if (!$settings instanceof \stdClass && !is_array($settings)) {
-                $type = (is_object($settings) ? get_class($settings) . ' ' : '') . gettype($settings);
-                throw new \InvalidArgumentException("Settings should be an array or stdClass object, not a $type."
-                    . " Use the `load` method to load settings from a source.");
-            }
-            
-            self::merge($this, static::objectify((object)$settings));
+        expect_type($settings, ['stdClass', 'array']);
+        static::mergeObjects($this, objectify((object)$settings));
+
+        if (isset($loader)) {
+            $this->i__loader = $loader;
         }
-    }
-    
-    
-    /**
-     * Get the loader
-     * 
-     * @param array $options
-     * @return LoaderInterface
-     */
-    protected function getLoader(array $options = [])
-    {
-        return isset($options['loader']) && $options['loader'] instanceof LoaderInterface
-            ? $options['loader'] : new Loader();
     }
 
     /**
-     * Assert the loaded data
+     * Get the loader
      * 
-     * @param \stdClass|mixed $data
-     * @throws \UnexpectedValueException
+     * @return LoaderInterface
      */
-    protected function assertData($data)
+    public function getLoader(): LoaderInterface
     {
-        if (!$data instanceof \stdClass) {
-            $type = (is_object($data) ? get_class($data) . ' ' : '') . gettype($data);
-            throw new \UnexpectedValueException("Loader returned a $type instead of a Config object");
+        if (!isset($this->i__loader)) {
+            $this->i__loader = new DelegateLoader();
         }
+
+        return $this->i__loader;
     }
-    
+
     /**
      * Load configuration
      * 
@@ -62,63 +61,47 @@ class Config extends \stdClass
      * @param array $options  Loader options
      * @return $this
      */
-    public function load($source, array $options = [])
+    public function load($source, array $options = []): self
     {
-        $loader = $this->getLoader($options);
+        $loader = $this->getLoader();
         $data = $loader->load($source, $options);
-        
-        if (isset($data)) {
-            $this->assertData($data);
-            static::merge($this, $data);
-        }
-        
-        return $this;
+
+        expect_type($data, stdClass::class);
+
+        return static::mergeObjects($this, $data);
     }
 
-    
     /**
-     * Assert each argument is a stdClass
-     * 
-     * @param \stdClass[] $args
-     * @throws \InvalidArgumentException
+     * Merge with other configuration
+     *
+     * @param stdClass[] $sources  Source objects
+     * @return $this
      */
-    protected static function assertMergeArguments(array $args)
+    public function merge(...$sources): self
     {
-        foreach ($args as $i => $arg) {
-            if (isset($arg) && !$arg instanceof \stdClass) {
-                $type = (is_object($arg) ? get_class($arg) . ' ' : '') . gettype($arg);
-                throw new \InvalidArgumentException("Argument " . ($i + 1) . " is not a stdClass object, but a $type");
-            }
-        }
+        return static::mergeObjects($this, ...$sources);
     }
-    
+
     /**
      * Recursive merge of 2 or more objects
      *
-     * @param \stdClass $target  The object that will be modified
-     * @param \stdClass $source  A source object 
-     * @param \stdClass ...
-     * @return \stdClass $target
+     * @param stdClass   $target   The object that will be modified
+     * @param stdClass[] $sources  Source objects
+     * @return stdClass  $target
      */
-    public static function merge(&$target, ...$sources)
+    protected static function mergeObjects(stdClass &$target, ...$sources): stdClass
     {
-        static::assertMergeArguments(func_get_args());
-        
-        foreach ($sources as $source) {
-            if (!isset($source)) {
-                continue;
-            }
-            
-            if (!isset($target)) {
-                $target = $source;
-                continue;
-            }
-            
-            $data = get_object_vars($source);
-        
-            foreach ($data as $key => $value) {
+        foreach ($sources as $i => $source) {
+            expect_type($source, stdClass::class, "TypeError",
+                "Expected source " . ($i + 1) . " to be a stdClass object, %s given");
+
+            foreach ($source as $key => $value) {
+                if (str_starts_with($key, 'i__')) {
+                    continue;
+                }
+
                 if (isset($target->$key) && is_object($value) && is_object($target->$key)) {
-                    static::merge($target->$key, $value);
+                    static::mergeObjects($target->$key, $value);
                 } else {
                     $target->$key = $value;
                 }
@@ -127,28 +110,95 @@ class Config extends \stdClass
         
         return $target;
     }
-    
+
+
     /**
-     * Turn an associative array into an stdClass object
+     * Finds an entry of the container by its identifier and returns it.
+     * Supports dot key notation.
      *
-     * @param array|\stdClass $data
-     * @return \stdClass
+     * @param string $key
+     * @return mixed
      */
-    public static function objectify($data)
+    public function get($key)
     {
-        if (!is_array($data) && !$data instanceof \stdClass) {
-            return $data;
+        expect_type($key, 'string');
+
+        $value = DotKey::on($this)->get($key);
+
+        if (!isset($value)) {
+            throw new NotFoundException("Config setting '$key' not found");
         }
-        
-        // Check if it's an associative array
-        if (is_array($data) && array_keys($data) !== array_keys(array_keys($data))) {
-            $data = (object)$data;
+
+        return $value;
+    }
+
+    /**
+     * Returns true if the container can return an entry for the given identifier.
+     * Supports dot key notation.
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function has($key)
+    {
+        expect_type($key, 'string');
+
+        return DotKey::on($this)->exists($key);
+    }
+
+
+    /**
+     * Save configuration as PHP script.
+     * This will speed up loading the configuration.
+     *
+     * @param string $filename
+     * @return void
+     */
+    public function saveAsScript(string $filename): void
+    {
+        $config = clone $this;
+        unset($config->i__loader);
+
+        $export = str_replace('stdClass::__set_state', '(object)', var_export($config, true));
+        $script = "<?php\nreturn $export;";
+
+        $success = file_put_contents($filename, $script, str_contains($filename, ':') ? 0 : LOCK_EX);
+
+        if ($success && function_exists('opcache_compile_file')) {
+            // @codeCoverageIgnoreStart
+            opcache_compile_file($filename);
+            // @codeCoverageIgnoreEnd
         }
-        
-        foreach ($data as &$item) {
-            $item = static::objectify($item);
+    }
+
+    /**
+     * Load configuration from PHP script.
+     *
+     * @param string $filename
+     * @return Config|null
+     */
+    public static function loadFromScript(string $filename): ?Config
+    {
+        if (
+            (function_exists('opcache_is_script_cached') && opcache_is_script_cached($filename)) ||
+            file_exists($filename)
+        ) {
+            return include $filename;
         }
-        
-        return $data;
+
+        return null;
+    }
+
+    /**
+     * Revive from var_export
+     *
+     * @param array $data
+     * @return static
+     */
+    public static function __set_state(array $data): self
+    {
+        $config = new static();
+
+        return $config->merge((object)$data);
     }
 }

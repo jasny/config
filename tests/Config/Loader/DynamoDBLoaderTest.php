@@ -1,16 +1,18 @@
 <?php
 
-namespace Jasny\Config;
+namespace Jasny\Config\Tests\Loader;
 
 use Aws\DynamoDb\DynamoDbClient;
 use Aws\DynamoDb\Exception\DynamoDbException;
 use Aws\CommandInterface;
 use Jasny\Config;
+use Jasny\Config\Loader\DynamoDBLoader;
+use PHPUnit\Framework\TestCase;
 
 /**
- * @covers DynamoDBLoader
+ * @covers \Jasny\Config\Loader\DynamoDBLoader
  */
-class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
+class DynamoDBLoaderTest extends TestCase
 {
     protected $dynamodb;
     
@@ -31,12 +33,12 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
     public function testAssertTableOption()
     {
         $loader = new DynamoDBLoader();
-        $loader->load($this->dynamodb, ['key' => 'foo']);
+        $loader->load($this->dynamodb, ['key_value' => 'foo']);
     }
     
     /**
      * @expectedException BadMethodCallException
-     * @expectedExceptionMessage Option 'key' is required to load configuration from DynamoDB
+     * @expectedExceptionMessage Option 'key_value' is required to load configuration from DynamoDB
      */
     public function testAssertKeyOption()
     {
@@ -45,7 +47,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \TypeError
      */
     public function testLoadWithInvalidConnection()
     {
@@ -60,20 +62,21 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key' => ['S' => 'dev'],
+                    'key_value' => ['S' => 'dev'],
                     'foo' => ['S' => 'bar'],
                     'zoo' => ['BOOL' => true]
                 ]
             ]);
         
         $loader = new DynamoDBLoader();
+        $options = ['table' => 'config', 'key_value' => 'dev'];
         
-        $config = $loader->load($this->dynamodb, ['table' => 'config', 'key' => 'dev']);
+        $config = $loader->load($this->dynamodb, $options);
 
         $this->assertEquals(new Config([
             'foo' => 'bar',
@@ -99,8 +102,9 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ]);
         
         $loader = new DynamoDBLoader();
+        $options = ['table' => 'config', 'key_field' => 'env', 'key_value' => 'dev'];
         
-        $config = $loader->load($this->dynamodb, ['table' => 'config', 'field' => 'env', 'key' => 'dev']);
+        $config = $loader->load($this->dynamodb, $options);
 
         $this->assertEquals(new Config([
             'env' => 'dev',
@@ -110,7 +114,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Jasny\ConfigException
+     * @expectedException \Jasny\Config\Exception\LoadException
      * @expectedExceptionMessage Failed to load 'dev' configuration from DynamoDB
      */
     public function testLoadWithKeyAndNonExistingTable()
@@ -119,14 +123,15 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'TableName' => 'nonexisting',
                 'Key' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ])
             ->willThrowException(new DynamoDbException("Not found", $this->createMock(CommandInterface::class)));
         
         $loader = new DynamoDBLoader();
+        $options = ['table' => 'nonexisting', 'key_value' => 'dev'];
         
-        $loader->load($this->dynamodb, ['table' => 'nonexisting', 'key' => 'dev']);
+        $loader->load($this->dynamodb, $options);
     }
 
     public function testLoadWithKeyAndNonExistingTableAndOptional()
@@ -135,20 +140,21 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'TableName' => 'nonexisting',
                 'Key' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ])
             ->willThrowException(new DynamoDbException("Not found", $this->createMock(CommandInterface::class)));
         
-        $loader = new DynamoDBLoader($options);
+        $loader = new DynamoDBLoader();
+        $options = ['table' => 'nonexisting', 'key_value' => 'dev', 'optional' => true];
 
-        $config = $loader->load($this->dynamodb, ['table' => 'nonexisting', 'key' => 'dev', 'optional' => true]);
+        $config = $loader->load($this->dynamodb, $options);
         
-        $this->assertNull($config);
+        $this->assertEquals(new Config(), $config);
     }
 
     /**
-     * @expectedException Jasny\ConfigException
+     * @expectedException \Jasny\Config\Exception\LoadException
      * @expectedExceptionMessage Failed to load 'nonexisting' configuration from DynamoDB: No item found with foo 'nonexisting'
      */
     public function testLoadWithNonExistingKey()
@@ -163,8 +169,9 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
         
         $loader = new DynamoDBLoader();
+        $options = ['table' => 'config', 'key_field' => 'foo', 'key_value' => 'nonexisting'];
 
-        $loader->load($this->dynamodb, ['table' => 'config', 'field' => 'foo', 'key' => 'nonexisting']);
+        $loader->load($this->dynamodb, $options);
     }
 
     public function testLoadWithNonExistingKeyAndOptional()
@@ -179,11 +186,11 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
         
         $loader = new DynamoDBLoader();
+        $options = ['table' => 'config', 'key_field' => 'foo', 'key_value' => 'nonexisting', 'optional' => true];
 
-        $config = $loader->load($this->dynamodb, ['table' => 'config', 'field' => 'foo', 'key' => 'nonexisting',
-            'optional' => true]);
+        $config = $loader->load($this->dynamodb, $options);
         
-        $this->assertNull($config);
+        $this->assertEquals(new Config(), $config);
     }
 
     
@@ -193,12 +200,12 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key' => ['S' => 'dev'],
+                    'key_value' => ['S' => 'dev'],
                     'settings' => ['M' => [
                         'foo' => ['S' => 'bar'],
                         'zoo' => ['BOOL' => true]
@@ -207,8 +214,9 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ]);
         
         $loader = new DynamoDBLoader();
-        
-        $config = $loader->load($this->dynamodb, ['table' => 'config', 'key' => 'dev', 'map' => 'settings']);
+        $options = ['table' => 'config', 'key_value' => 'dev', 'settings_field' => 'settings'];
+
+        $config = $loader->load($this->dynamodb, $options);
 
         $this->assertEquals(new Config([
             'foo' => 'bar',
@@ -217,7 +225,7 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Jasny\ConfigException
+     * @expectedException \Jasny\Config\Exception\LoadException
      * @expectedExceptionMessage DynamoDB item 'dev' doesn't have a 'nonexisting' field
      */
     public function testLoadWithNonExistingMap()
@@ -226,18 +234,19 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ]);
         
         $loader = new DynamoDBLoader();
+        $options = ['table' => 'config', 'key_value' => 'dev', 'settings_field' => 'nonexisting'];
         
-        $loader->load($this->dynamodb, ['table' => 'config', 'key' => 'dev', 'map' => 'nonexisting']);
+        $loader->load($this->dynamodb, $options);
     }
     
     public function testLoadWithNonExistingMapAndOptional()
@@ -246,25 +255,25 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ]);
         
         $loader = new DynamoDBLoader();
+        $options = ['table' => 'config', 'key_value' => 'dev', 'settings_field' => 'nonexisting', 'optional' => true];
         
-        $config = $loader->load($this->dynamodb, ['table' => 'config', 'key' => 'dev', 'map' => 'nonexisting',
-            'optional' => true]);
+        $config = $loader->load($this->dynamodb, $options);
 
-        $this->assertNull($config);
+        $this->assertEquals(new Config(), $config);
     }
     
     /**
-     * @expectedException Jasny\ConfigException
+     * @expectedException \Jasny\Config\Exception\LoadException
      * @expectedExceptionMessage DynamoDB 'dev' configuration isn't a key/value map
      */
     public function testLoadWithInvalidMap()
@@ -273,18 +282,19 @@ class DynamoDBLoaderTest extends \PHPUnit_Framework_TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key' => ['S' => 'dev']
+                    'key_value' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key' => ['S' => 'dev'],
+                    'key_value' => ['S' => 'dev'],
                     'settings' => ['S' => 'foo']
                 ]
             ]);
         
         $loader = new DynamoDBLoader();
+        $options = ['table' => 'config', 'key_value' => 'dev', 'settings_field' => 'settings'];
         
-        $loader->load($this->dynamodb, ['table' => 'config', 'key' => 'dev', 'map' => 'settings']);
+        $loader->load($this->dynamodb, $options);
     }
 }

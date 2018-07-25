@@ -2,13 +2,13 @@
 
 <phpunit
     colors="true"
-    bootstrap="tests/bootstrap.php"
+    bootstrap="vendor/autoload.php"
     convertErrorsToExceptions="true"
     convertNoticesToExceptions="true"
     convertWarningsToExceptions="true"
 >
     <testsuites>
-        <testsuite>
+        <testsuite name="Config">
             <directory>tests/</directory>
         </testsuite>
     </testsuites>

@@ -1,6 +1,6 @@
 {
     "name": "jasny/config",
-    "description": "Configure your application. You can load .ini, .json, .yaml or .neon files or a MySQL DB.",
+    "description": "Configure your application",
     "keywords": ["config", "configuration", "ini", "json", "yaml", "db", "mysql"],
     "license": "MIT",
     "authors": [
@@ -15,19 +15,22 @@
         "source": "https://github.com/jasny/Config"
     },
     "require": {
-        "php": ">=5.6.0"
+        "php": ">=7.1",
+        "jasny/php-functions": "^3.3",
+        "psr/container": "^1.0",
+        "jasny/dotkey": "^1.0"
     },
     "require-dev": {
         "ext-mysqli": "*",
         "ext-yaml": "*",
-        "jasny/php-code-quality": "^2.0",
-        "mustangostang/spyc": "^0.6",
+        "ext-json": "*",
+        "jasny/php-code-quality": "^2.3",
       	"symfony/yaml": "^3.0",
         "nette/neon": "^2.3",
         "aws/aws-sdk-php": "^3.2"
     },
     "suggest": {
-        "symfony/yaml": "To support YAML without the yaml or syck php extension",
+        "symfony/yaml": "To support YAML without the yaml php extension",
         "nette/neon": "Required to use the NEON notation",
         "aws/aws-sdk-php": "Required to load configuration from AWS DynamoDB"
     },

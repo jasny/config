@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Jasny\Config\Loader;
 
 use Jasny\Config;
@@ -18,11 +20,11 @@ class JsonLoader extends AbstractFileLoader
      * 
      * @param \stdClass|null|mixed $data
      * @param string $file
-     * @throws ConfigException
+     * @throws LoadException
      */
     protected function assertData($data, string $file): void
     {
-        if ($data === null && json_last_error()) {
+        if ($data === null && json_last_error() !== JSON_ERROR_NONE) {
             throw new LoadException("Failed to load settings from '$file': " . json_last_error_msg());
         }
 

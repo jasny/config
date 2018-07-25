@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Jasny\Config\Loader;
 
 use Jasny\Config;
@@ -21,9 +23,10 @@ class DynamoDBLoader implements LoaderInterface
      * Assert that required options are set
      * 
      * @param array $options
-     * @throws ConfigException
+     * @return void
+     * @throws LoadException
      */
-    protected function assertOptions(array $options)
+    protected function assertOptions(array $options): void
     {
         if (!isset($options['table'])) {
             throw new BadMethodCallException("Option 'table' is required to load configuration from DynamoDB");
@@ -44,21 +47,22 @@ class DynamoDBLoader implements LoaderInterface
      */
     protected function mapData(array $data, array $options)
     {
-        if (empty($options['settings_field'])) {
-            if (!isset($options['key_field'])) {
-                unset($data['key_value']);
+        if (!isset($options['settings_field'])) {
+            $field = $options['key_field'] ?? 'key';
+            expect_type($field, 'string', \BadMethodCallException::class);
+
+            unset($data[$field]);
+        } else {
+            $field = $options['settings_field'];
+
+            if (!isset($data[$field]) && !(bool)($options['optional'] ?? false)) {
+                throw new LoadException("DynamoDB item '{$options['key_value']}' doesn't have a '$field' field");
             }
-            
-            return $data;
-        }
-        
-        $field = $options['settings_field'];
 
-        if (!isset($data[$field]) && empty($options['optional'])) {
-            throw new LoadException("DynamoDB item '{$options['key_value']}' doesn't have a '$field' field");
+            $data = $data[$field] ?? [];
         }
 
-        return isset($data[$field]) ? $data[$field] : [];
+        return $data;
     }
     
     /**
@@ -66,13 +70,16 @@ class DynamoDBLoader implements LoaderInterface
      *
      * @param DynamoDbClient $dynamodb  DB connection
      * @param array          $options
-     * @return array
+     * @return array|mixed
      */
     protected function loadDataFromItem(DynamoDbClient $dynamodb, array $options)
     {
-        $field = isset($options['key_field']) ? $options['key_field'] : 'key_value';
+        $field = $options['key_field'] ?? 'key';
+        expect_type($field, 'string', \BadMethodCallException::class);
+
         $key = $options['key_value'];
-        
+        expect_type($key, 'string', \BadMethodCallException::class);
+
         try {
             $result = $dynamodb->getItem([
                 'TableName' => $options["table"],
@@ -81,14 +88,14 @@ class DynamoDBLoader implements LoaderInterface
                 ]
             ]);
             
-            if (!isset($result['Item']) && empty($options['optional'])) {
+            if (!isset($result['Item']) && !(bool)($options['optional'] ?? false)) {
                 throw new LoadException("Failed to load '{$options['key_value']}' configuration from DynamoDB: "
                     . "No item found with $field '$key'");
             }
             
             $item = isset($result['Item']) ? $result['Item'] : null;
         } catch (DynamoDbException $e) {
-            if (empty($options['optional'])) {
+            if (!(bool)($options['optional'] ?? false)) {
                 throw new LoadException("Failed to load '{$options['key_value']}' configuration from DynamoDB", 0, $e);
             }
         }
@@ -118,7 +125,7 @@ class DynamoDBLoader implements LoaderInterface
 
         $data = $this->loadDataFromItem($dynamodb, $options);
 
-        if (isset($data) && !is_array($data)) {
+        if (!is_array($data)) {
             throw new LoadException("DynamoDB '{$options['key_value']}' configuration isn't a key/value map");
         }
 

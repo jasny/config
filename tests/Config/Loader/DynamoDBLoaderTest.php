@@ -62,12 +62,12 @@ class DynamoDBLoaderTest extends TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key_value' => ['S' => 'dev'],
+                    'key' => ['S' => 'dev'],
                     'foo' => ['S' => 'bar'],
                     'zoo' => ['BOOL' => true]
                 ]
@@ -107,7 +107,6 @@ class DynamoDBLoaderTest extends TestCase
         $config = $loader->load($this->dynamodb, $options);
 
         $this->assertEquals(new Config([
-            'env' => 'dev',
             'foo' => 'bar',
             'zoo' => true
         ]), $config);
@@ -123,7 +122,7 @@ class DynamoDBLoaderTest extends TestCase
             ->with([
                 'TableName' => 'nonexisting',
                 'Key' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ])
             ->willThrowException(new DynamoDbException("Not found", $this->createMock(CommandInterface::class)));
@@ -140,7 +139,7 @@ class DynamoDBLoaderTest extends TestCase
             ->with([
                 'TableName' => 'nonexisting',
                 'Key' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ])
             ->willThrowException(new DynamoDbException("Not found", $this->createMock(CommandInterface::class)));
@@ -200,12 +199,12 @@ class DynamoDBLoaderTest extends TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key_value' => ['S' => 'dev'],
+                    'key' => ['S' => 'dev'],
                     'settings' => ['M' => [
                         'foo' => ['S' => 'bar'],
                         'zoo' => ['BOOL' => true]
@@ -234,12 +233,12 @@ class DynamoDBLoaderTest extends TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ]);
         
@@ -255,12 +254,12 @@ class DynamoDBLoaderTest extends TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ]);
         
@@ -282,12 +281,12 @@ class DynamoDBLoaderTest extends TestCase
             ->with([
                 'TableName' => 'config',
                 'Key' => [
-                    'key_value' => ['S' => 'dev']
+                    'key' => ['S' => 'dev']
                 ]
             ])
             ->willReturn([
                 'Item' => [
-                    'key_value' => ['S' => 'dev'],
+                    'key' => ['S' => 'dev'],
                     'settings' => ['S' => 'foo']
                 ]
             ]);

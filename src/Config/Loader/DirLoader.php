@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Jasny\Config\Loader;
 
 use Jasny\Config;
@@ -67,20 +69,15 @@ class DirLoader implements LoaderInterface
      * @param string $dir
      * @param array  $options
      * @return boolean
-     * @throws ConfigException
+     * @throws LoadException
      */
-    protected function assertDir($dir, array $options)
+    protected function assertDir(string $dir, array $options)
     {
-        if (!is_string($dir) && !(is_object($dir) && method_exists($dir, '__toString'))) {
-            $type = (is_object($dir) ? get_class($dir) . ' ' : '') . gettype($dir);
-            throw new TypeError("Expected a string as directory, got a $type");
-        }
-        
-        if (is_dir((string)$dir)) {
+        if (is_dir($dir)) {
             return true;
         }
         
-        if (empty($options['optional'])) {
+        if (!(bool)($options['optional'] ?? false)) {
             throw new LoadException("Config directory '$dir' doesn't exist");
         }
 
@@ -98,7 +95,7 @@ class DirLoader implements LoaderInterface
     protected function loadFile(string $file, array $options): ?Config
     {
         if (is_dir($file)) {
-            return !empty($options['recursive']) ? $this->load($file, $options) : null;
+            return (bool)($options['recursive'] ?? false) ? $this->load($file, $options) : null;
         }
 
         return $this->getFileLoader()->load($file, $options);
@@ -119,7 +116,7 @@ class DirLoader implements LoaderInterface
             return $config;
         }
         
-        $dir = rtrim((string)$dir, DIRECTORY_SEPARATOR);
+        $dir = rtrim($dir, DIRECTORY_SEPARATOR);
 
         foreach (scandir($dir) as $file) {
             if ($file[0] == '.') {

@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Jasny\Config\Loader;
 
 use Jasny\Config\Loader\AbstractFileLoader;
@@ -17,11 +19,11 @@ class YamlLoader extends AbstractFileLoader
      *
      * @param array|false|mixed $data
      * @param string            $file
-     * @throws ConfigException
+     * @throws LoadException
      */
     protected function assertData($data, string $file): void
     {
-        if ($data === false && error_get_last()) {
+        if ($data === false && error_get_last() !== null) {
             $err = preg_replace('/^yaml_\w+\(\): /', '', error_get_last()["message"]);
             throw new LoadException("Failed to load settings from '$file': $err");
         }
@@ -46,6 +48,8 @@ class YamlLoader extends AbstractFileLoader
 
         // Workaround for the bad practise of PHP extensions to trigger a warning and return false.
         error_clear_last();
+
+        $unused = null;
 
         $data = @yaml_parse(
             $yaml,

@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Jasny;
 
 use Jasny\Config\Exception\NotFoundException;
@@ -68,7 +70,9 @@ class Config extends stdClass implements ContainerInterface
 
         expect_type($data, stdClass::class);
 
-        return static::mergeObjects($this, $data);
+        static::mergeObjects($this, $data);
+
+        return $this;
     }
 
     /**
@@ -77,9 +81,11 @@ class Config extends stdClass implements ContainerInterface
      * @param stdClass[] $sources  Source objects
      * @return $this
      */
-    public function merge(...$sources): self
+    public function merge(stdClass ...$sources): self
     {
-        return static::mergeObjects($this, ...$sources);
+        static::mergeObjects($this, ...$sources);
+
+        return $this;
     }
 
     /**
@@ -87,14 +93,11 @@ class Config extends stdClass implements ContainerInterface
      *
      * @param stdClass   $target   The object that will be modified
      * @param stdClass[] $sources  Source objects
-     * @return stdClass  $target
+     * @return void
      */
-    protected static function mergeObjects(stdClass &$target, ...$sources): stdClass
+    protected static function mergeObjects(stdClass &$target, stdClass ...$sources): void
     {
-        foreach ($sources as $i => $source) {
-            expect_type($source, stdClass::class, "TypeError",
-                "Expected source " . ($i + 1) . " to be a stdClass object, %s given");
-
+        foreach ($sources as $source) {
             foreach ($source as $key => $value) {
                 if (str_starts_with($key, 'i__')) {
                     continue;
@@ -107,8 +110,6 @@ class Config extends stdClass implements ContainerInterface
                 }
             }
         }
-        
-        return $target;
     }
 
 

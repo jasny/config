@@ -27,7 +27,9 @@
         "jasny/php-code-quality": "^2.3",
       	"symfony/yaml": "^3.0",
         "nette/neon": "^2.3",
-        "aws/aws-sdk-php": "^3.2"
+        "aws/aws-sdk-php": "^3.2",
+        "phpstan/phpstan": "^0.10.2",
+        "phpstan/phpstan-strict-rules": "^0.10.1"
     },
     "suggest": {
         "symfony/yaml": "To support YAML without the yaml php extension",

@@ -189,33 +189,10 @@ class DirLoaderTest extends TestCase
         $this->assertInstanceOf(Config::class, $result);
         $this->assertEquals(new Config(), $result);
     }
-    
-    public function testLoadWithStringableObject()
-    {
-        $ape = new Config(['q' => 'abc', 'b' => 27]);
-        
-        vfsStream::create([
-            'ape' => '',
-        ]);
-        
-        $fileLoader = $this->createMock(LoaderInterface::class);
 
-        $fileLoader->expects($this->at(0))->method('load')->with('vfs://root/ape')->willReturn($ape);
-        
-        $dir = $this->createPartialMock('stdClass', ['__toString']);
-        $dir->method('__toString')->willReturn(vfsStream::url('root'));
-
-        $this->loader->setFileLoader($fileLoader);
-
-        $result = $this->loader->load($dir);
-        
-        $this->assertInstanceOf(Config::class, $result);
-        $this->assertEquals(new Config(compact('ape')), $result);
-    }
     
     /**
      * @expectedException \TypeError
-     * @expectedExceptionMessage Expected a string as directory, got a array
      */
     public function testLoadWithInvalidArgument()
     {

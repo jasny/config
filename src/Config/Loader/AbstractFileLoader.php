@@ -1,10 +1,13 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Jasny\Config\Loader;
 
 use Jasny\Config;
 use Jasny\Config\LoaderInterface;
 use Jasny\Config\Exception\LoadException;
+use Jasny\Config\Exception\NotFoundException;
 use stdClass;
 
 use function Jasny\is_associative_array;
@@ -79,7 +82,7 @@ abstract class AbstractFileLoader implements LoaderInterface
             return true;
         }
 
-        if (empty($options['optional'])) {
+        if (!(bool)($options['optional'] ?? false)) {
             throw new LoadException("Config file '$file' doesn't exist or is not readable");
         }
 
@@ -109,7 +112,7 @@ abstract class AbstractFileLoader implements LoaderInterface
     /**
      * Load a config file or directory
      *
-     * @param string $filex`
+     * @param string $file`
      * @param array  $options
      * @return Config
      */

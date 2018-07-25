@@ -1,0 +1,9 @@
+parameters:
+    level: 4
+    paths:
+        - src
+    ignoreErrors:
+        - '/PHPDoc tag @param for parameter \$sources with type array<stdClass> is not subtype of native type array<int, stdClass>/'
+        - '/Argument of an invalid type stdClass supplied for foreach, only iterables are supported./'
+includes:
+  	- vendor/phpstan/phpstan-strict-rules/rules.neon

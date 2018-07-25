@@ -127,7 +127,7 @@ class ConfigTest extends TestCase
     
     /**
      * @expectedException TypeError
-     * @expectedExceptionMessage Expected source 3 to be a stdClass object, string given
+     * @expectedExceptionMessage Argument 3 passed to Jasny\Config::merge() must be an instance of stdClass, string given
      */
     public function testMergeWithInvalidArgument()
     {

@@ -1,5 +1,7 @@
 <?php
 
+declare (strict_types = 1);
+
 namespace Jasny\Config\Loader;
 
 use Jasny\Config;
@@ -67,7 +69,7 @@ class DelegateLoader implements LoaderInterface
             }
         }
 
-        $desc = (is_object($source) ? get_class($source) . ' ' : '') . gettype($source);
+        $desc = get_class($source) . ' ' . gettype($source);
         throw new NoLoaderException("Don't know how to load configuration from $desc");
     }
 
@@ -87,9 +89,7 @@ class DelegateLoader implements LoaderInterface
         $key = is_dir($source) ? 'dir' : (pathinfo($source, PATHINFO_EXTENSION) ?: null);
 
         if (!isset($key) || !isset($this->loaders[$key])) {
-            $desc = is_scalar($source) ? "'$source'"
-                : 'a ' . (is_object($source) ? get_class($source) . ' ' : '') . gettype($source);
-            throw new NoLoaderException("Don't know how to load configuration from $desc");
+            throw new NoLoaderException("Don't know how to load configuration from '$source'");
         }
 
         return $this->loaders[$key];

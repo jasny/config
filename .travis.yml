@@ -18,7 +18,6 @@ install:
   
 script:
   - vendor/bin/phpunit --coverage-clover cache/logs/clover.xml
-  - phpstan analyze
 
 after_success:
   - php "$HOME/ocular.phar" code-coverage:upload --format=php-clover cache/logs/clover.xml

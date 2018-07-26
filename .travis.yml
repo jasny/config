@@ -10,6 +10,7 @@ branches:
 
 before_install:
   - yes '' | pecl install yaml
+  - echo -e "opcache.enable = On\nopcache.enable_cli = On" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 install:
   - composer install

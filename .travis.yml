@@ -4,8 +4,12 @@ php:
   - 7.1
   - 7.2
 
+branches:
+  only:
+    - master
+
 before_install:
-  - echo "extension = yaml.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+  - yes '' | pecl install yaml
 
 install:
   - composer install

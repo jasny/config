@@ -1,6 +1,6 @@
 <?php
 
-declare (strict_types = 1);
+declare(strict_types=1);
 
 namespace Jasny\Config\Loader;
 
@@ -31,7 +31,7 @@ class DelegateLoader implements LoaderInterface
     {
         foreach ((array)$loaders as $key => $loader) {
             expect_type($loader, LoaderInterface::class, UnexpectedValueException::class,
-                "Expected $key to be a LoaderInterface object, %s given");
+                "expected $key to be a LoaderInterface object, %s given");
         }
 
         $this->loaders = $loaders ?? static::getDefaultLoaders($this);

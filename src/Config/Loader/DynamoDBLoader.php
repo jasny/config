@@ -43,7 +43,7 @@ class DynamoDBLoader implements LoaderInterface
      * 
      * @param array $data
      * @param array $options
-     * @return array
+     * @return array|mixed
      */
     protected function mapData(array $data, array $options)
     {

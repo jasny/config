@@ -18,7 +18,7 @@ class IniLoader extends AbstractFileLoader
      *
      * @param string $file    Filename
      * @param array  $options
-     * @return array
+     * @return array|false
      */
     protected function loadFile(string $file, array $options)
     {

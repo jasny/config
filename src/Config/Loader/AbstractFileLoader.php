@@ -49,7 +49,7 @@ abstract class AbstractFileLoader implements LoaderInterface
      *
      * @param string $file
      * @param array  $options
-     * @return array|stdClass
+     * @return array|stdClass|mixed
      */
     abstract protected function loadFile(string $file, array $options);
 

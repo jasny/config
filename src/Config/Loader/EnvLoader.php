@@ -53,8 +53,6 @@ class EnvLoader implements LoaderInterface
         $config = new Config();
         $dotkey = DotKey::on($config);
 
-        $vars = getenv();
-
         foreach ($options['map'] as $env => $key) {
             $value = $this->getenv($env);
 

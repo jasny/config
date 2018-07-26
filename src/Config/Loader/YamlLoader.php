@@ -8,6 +8,7 @@ use Jasny\Config\Loader\AbstractFileLoader;
 use Jasny\Config\Exception\LoadException;
 
 use function Jasny\str_contains;
+use function Jasny\is_associative_array;
 
 /**
  * Parse yaml file using the `yaml` PHP extension
@@ -28,7 +29,7 @@ class YamlLoader extends AbstractFileLoader
             throw new LoadException("Failed to load settings from '$file': $err");
         }
 
-        if (!\Jasny\is_associative_array($data)) {
+        if (!is_array($data) || !is_associative_array($data)) {
             throw new LoadException("Failed to load settings from '$file': data should be key/value pairs");
         }
     }

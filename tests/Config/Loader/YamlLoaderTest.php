@@ -135,7 +135,7 @@ YAML;
 
     /**
      * @expectedException \Jasny\Config\Exception\LoadException
-     * @expectedExceptionMessage Failed to load settings from 'vfs://root/test.yaml': end of stream reached without finding document 0
+     * @expectedExceptionMessage Failed to load settings from 'vfs://root/test.yaml'
      */
     public function testLoadFailed()
     {

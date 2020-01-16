@@ -16,7 +16,7 @@
     },
     "require": {
         "php": ">=7.1",
-        "jasny/php-functions": "^3.3",
+        "jasny/php-functions": "^3.3|^4.0",
         "psr/container": "^1.0",
         "jasny/dotkey": "^1.0"
     },
@@ -24,7 +24,7 @@
         "ext-mysqli": "*",
         "ext-yaml": "*",
         "ext-json": "*",
-        "jasny/php-code-quality": "^2.3",
+        "jasny/php-code-quality": "2.3.*",
       	"symfony/yaml": "^3.0",
         "nette/neon": "^2.3",
         "aws/aws-sdk-php": "^3.2",
